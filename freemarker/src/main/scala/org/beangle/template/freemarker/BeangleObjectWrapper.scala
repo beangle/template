@@ -20,19 +20,19 @@ package org.beangle.template.freemarker
 
 import java.beans.PropertyDescriptor
 import java.lang.reflect.{ Method, Modifier }
+import java.time.{ Instant, LocalDate, LocalDateTime, LocalTime, ZoneId, ZonedDateTime }
+import java.time.temporal.Temporal
 import java.{ util => ju }
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.{ asJavaCollection, mapAsJavaMap, setAsJavaSet }
 
 import org.beangle.commons.lang.Strings.{ substringAfter, uncapitalize }
 
 import freemarker.core.CollectionAndSequence
-import freemarker.ext.beans.{ BeansWrapper, BeansWrapperConfiguration, MapModel, MethodAppearanceFineTuner }
-import freemarker.ext.beans.BeansWrapper.MethodAppearanceDecision
-import freemarker.ext.beans.BeansWrapper.MethodAppearanceDecisionInput
-import freemarker.template.{ AdapterTemplateModel, Configuration, DefaultObjectWrapper, DefaultObjectWrapperConfiguration, SimpleCollection, SimpleDate }
-import freemarker.template.{ TemplateModelAdapter, SimpleNumber, SimpleScalar, SimpleSequence, TemplateBooleanModel, TemplateCollectionModel, TemplateHashModelEx }
-import freemarker.template.{ TemplateMethodModelEx, TemplateModel }
+import freemarker.ext.beans.{ BeansWrapperConfiguration, MapModel, MethodAppearanceFineTuner }
+import freemarker.ext.beans.BeansWrapper.{ MethodAppearanceDecision, MethodAppearanceDecisionInput }
+import freemarker.ext.beans.BeansWrapper
+import freemarker.template.{ AdapterTemplateModel, Configuration, DefaultObjectWrapper, DefaultObjectWrapperConfiguration, SimpleCollection, SimpleDate, SimpleNumber, SimpleScalar, SimpleSequence, TemplateBooleanModel, TemplateCollectionModel, TemplateDateModel, TemplateHashModelEx, TemplateMethodModelEx, TemplateModel, TemplateModelAdapter }
 
 object BeangleObjectWrapper {
   def wrapperConfig(): BeansWrapperConfiguration = {
@@ -57,6 +57,14 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       //basic types
       case s: String   => new SimpleScalar(s)
       case num: Number => new SimpleNumber(num)
+      case temporal: Temporal =>
+        temporal match {
+          case t: Instant       => new SimpleDate(java.util.Date.from(t), TemplateDateModel.DATETIME)
+          case t: ZonedDateTime => new SimpleDate(java.util.Date.from(t.toInstant), TemplateDateModel.DATETIME)
+          case t: LocalDateTime => new SimpleDate(java.util.Date.from(t.atZone(ZoneId.systemDefault()).toInstant()), TemplateDateModel.DATETIME)
+          case t: LocalDate     => new SimpleDate(java.sql.Date.valueOf(t), TemplateDateModel.DATE)
+          case t: LocalTime     => new SimpleDate(java.sql.Time.valueOf(t))
+        }
       case date: ju.Date => {
         date match {
           case sdate: java.sql.Date           => new SimpleDate(sdate)
