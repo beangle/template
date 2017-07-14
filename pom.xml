@@ -12,8 +12,8 @@
   <name>Beangle Template Parent</name>
 
   <properties>
-    <commons.version>5.0.0.M3</commons.version>
-    <freemarker.version>2.3.25-incubating</freemarker.version>
+    <commons.version>5.0.0.M4</commons.version>
+    <freemarker.version>2.3.26-incubating</freemarker.version>
   </properties>
 
   <modules>
