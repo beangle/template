@@ -107,9 +107,8 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
 class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends MapModel(map, wrapper) with TemplateHashModelEx
     with TemplateMethodModelEx with AdapterTemplateModel {
 
-  // Struts2将父类的&& super.isEmpty()省去了，原因不知
   override def isEmpty(): Boolean = {
-    `object`.asInstanceOf[ju.Map[_, _]].isEmpty()
+    `object`.asInstanceOf[ju.Map[_, _]].isEmpty
   }
 
   // 此处实现与MapModel不同，MapModel中复制了一个集合,同时不要复制object中的keys
@@ -140,7 +139,7 @@ class ScalaMethodAppearanceFineTuner extends MethodAppearanceFineTuner {
 
   private def propertyName(m: Method): Option[String] = {
     val name = m.getName
-    if (m.getParameterTypes().length == 0 && classOf[Unit] != m.getReturnType() && Modifier.isPublic(m.getModifiers)
+    if (m.getParameterTypes.length == 0 && classOf[Unit] != m.getReturnType() && Modifier.isPublic(m.getModifiers)
       && !Modifier.isStatic(m.getModifiers) && !Modifier.isSynchronized(m.getModifiers)) {
       if (name.startsWith("get") && name.length > 3 && Character.isUpperCase(name.charAt(3))) Some(uncapitalize(substringAfter(name, "get")))
       else if (name.startsWith("is") && name.length > 2 && Character.isUpperCase(name.charAt(2))) Some(uncapitalize(substringAfter(name, "is")))
