@@ -32,7 +32,6 @@ class SimpleMethodModel(obj: AnyRef, methodInfos: Seq[MethodInfo], wrapper: Bean
 
   override def exec(arguments: java.util.List[_]): AnyRef = {
     try {
-
       val args = unwrapArguments(arguments, wrapper)
       methodInfos.find(x => x.parameterTypes.size == arguments.size) match {
         case Some(x) =>

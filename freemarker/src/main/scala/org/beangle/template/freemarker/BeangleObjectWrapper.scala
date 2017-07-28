@@ -20,19 +20,19 @@ package org.beangle.template.freemarker
 
 import java.beans.PropertyDescriptor
 import java.lang.reflect.{ Method, Modifier }
+import java.time.{ Instant, LocalDate, LocalDateTime, LocalTime, ZoneId, ZonedDateTime }
+import java.time.temporal.Temporal
 import java.{ util => ju }
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.{ asJavaCollection, mapAsJavaMap, setAsJavaSet }
 
 import org.beangle.commons.lang.Strings.{ substringAfter, uncapitalize }
 
 import freemarker.core.CollectionAndSequence
-import freemarker.ext.beans.{ BeansWrapper, BeansWrapperConfiguration, MapModel, MethodAppearanceFineTuner }
-import freemarker.ext.beans.BeansWrapper.MethodAppearanceDecision
-import freemarker.ext.beans.BeansWrapper.MethodAppearanceDecisionInput
-import freemarker.template.{ AdapterTemplateModel, Configuration, DefaultObjectWrapper, DefaultObjectWrapperConfiguration, SimpleCollection, SimpleDate }
-import freemarker.template.{ TemplateModelAdapter, SimpleNumber, SimpleScalar, SimpleSequence, TemplateBooleanModel, TemplateCollectionModel, TemplateHashModelEx }
-import freemarker.template.{ TemplateMethodModelEx, TemplateModel }
+import freemarker.ext.beans.{ BeansWrapperConfiguration, MapModel, MethodAppearanceFineTuner }
+import freemarker.ext.beans.BeansWrapper.{ MethodAppearanceDecision, MethodAppearanceDecisionInput }
+import freemarker.ext.beans.BeansWrapper
+import freemarker.template.{ AdapterTemplateModel, Configuration, DefaultObjectWrapper, DefaultObjectWrapperConfiguration, SimpleCollection, SimpleDate, SimpleNumber, SimpleScalar, SimpleSequence, TemplateBooleanModel, TemplateCollectionModel, TemplateDateModel, TemplateHashModelEx, TemplateMethodModelEx, TemplateModel, TemplateModelAdapter }
 
 object BeangleObjectWrapper {
   def wrapperConfig(): BeansWrapperConfiguration = {
@@ -57,6 +57,14 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       //basic types
       case s: String   => new SimpleScalar(s)
       case num: Number => new SimpleNumber(num)
+      case temporal: Temporal =>
+        temporal match {
+          case t: Instant       => new SimpleDate(java.util.Date.from(t), TemplateDateModel.DATETIME)
+          case t: ZonedDateTime => new SimpleDate(java.util.Date.from(t.toInstant), TemplateDateModel.DATETIME)
+          case t: LocalDateTime => new SimpleDate(java.util.Date.from(t.atZone(ZoneId.systemDefault()).toInstant()), TemplateDateModel.DATETIME)
+          case t: LocalDate     => new SimpleDate(java.sql.Date.valueOf(t), TemplateDateModel.DATE)
+          case t: LocalTime     => new SimpleDate(java.sql.Time.valueOf(t))
+        }
       case date: ju.Date => {
         date match {
           case sdate: java.sql.Date           => new SimpleDate(sdate)
@@ -99,9 +107,8 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
 class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends MapModel(map, wrapper) with TemplateHashModelEx
     with TemplateMethodModelEx with AdapterTemplateModel {
 
-  // Struts2将父类的&& super.isEmpty()省去了，原因不知
   override def isEmpty(): Boolean = {
-    `object`.asInstanceOf[ju.Map[_, _]].isEmpty()
+    `object`.asInstanceOf[ju.Map[_, _]].isEmpty
   }
 
   // 此处实现与MapModel不同，MapModel中复制了一个集合,同时不要复制object中的keys
@@ -132,7 +139,7 @@ class ScalaMethodAppearanceFineTuner extends MethodAppearanceFineTuner {
 
   private def propertyName(m: Method): Option[String] = {
     val name = m.getName
-    if (m.getParameterTypes().length == 0 && classOf[Unit] != m.getReturnType() && Modifier.isPublic(m.getModifiers)
+    if (m.getParameterTypes.length == 0 && classOf[Unit] != m.getReturnType() && Modifier.isPublic(m.getModifiers)
       && !Modifier.isStatic(m.getModifiers) && !Modifier.isSynchronized(m.getModifiers)) {
       if (name.startsWith("get") && name.length > 3 && Character.isUpperCase(name.charAt(3))) Some(uncapitalize(substringAfter(name, "get")))
       else if (name.startsWith("is") && name.length > 2 && Character.isUpperCase(name.charAt(2))) Some(uncapitalize(substringAfter(name, "is")))
