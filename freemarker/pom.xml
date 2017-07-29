@@ -12,7 +12,6 @@
   <properties>
     <bundle.symbolicName>org.beangle.template.freemarker</bundle.symbolicName>
     <bundle.namespace>org.beangle.template.freemarker</bundle.namespace>
-    <freemarker.version>2.3.25-incubating</freemarker.version>
   </properties>
 
   <dependencies>
