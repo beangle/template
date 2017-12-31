@@ -2,18 +2,18 @@
   <parent>
     <groupId>org.beangle</groupId>
     <artifactId>beangle-scala</artifactId>
-    <version>24.2</version>
+    <version>24.5</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.template</groupId>
   <artifactId>beangle-template-parent_2.12</artifactId>
-  <version>0.0.18</version>
+  <version>0.0.19</version>
   <packaging>pom</packaging>
   <name>Beangle Template Parent</name>
 
   <properties>
-    <commons.version>5.0.0.M6</commons.version>
-    <freemarker.version>2.3.26-incubating</freemarker.version>
+    <commons.version>5.0.0</commons.version>
+    <freemarker.version>2.3.27-incubating</freemarker.version>
   </properties>
 
   <modules>
