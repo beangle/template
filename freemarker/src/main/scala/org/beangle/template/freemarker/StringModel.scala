@@ -18,16 +18,19 @@
  */
 package org.beangle.template.freemarker
 
-import org.beangle.commons.lang.reflect.{ BeanInfos, ClassInfos }
-
 import freemarker.core.CollectionAndSequence
-import freemarker.ext.beans.{ BeanModel, BeansWrapper }
-import freemarker.template.{ SimpleSequence, TemplateCollectionModel, TemplateModel, TemplateScalarModel }
+import freemarker.ext.beans.{BeanModel, BeansWrapper}
+import freemarker.template.{SimpleSequence, TemplateCollectionModel, TemplateModel, TemplateScalarModel}
+import org.beangle.commons.lang.reflect.{BeanInfos, ClassInfos}
+
+import scala.jdk.javaapi.CollectionConverters.asJava
 
 class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`object`, wrapper) with TemplateScalarModel {
 
   override def get(key: String): TemplateModel = {
-    if (key == "class") return wrapper.wrap(`object`.getClass)
+    if (key == "class") {
+      wrapper.wrap(`object`.getClass)
+    }
     else {
       val clazzName = `object`.getClass.getName
       if (clazzName.startsWith("java.") || clazzName.startsWith("scala.")) {
@@ -50,30 +53,30 @@ class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`ob
 
   override def keys(): TemplateCollectionModel = {
     val properties = BeanInfos.Default.get(`object`.getClass).properties
-    val keySet = collection.JavaConverters.setAsJavaSet(properties.keySet)
-    new CollectionAndSequence(new SimpleSequence(keySet, wrapper))
+    new CollectionAndSequence(new SimpleSequence(asJava(properties.keySet), wrapper))
   }
 
   override def values(): TemplateCollectionModel = {
     val properties = BeanInfos.Default.get(`object`.getClass).properties
     val values = new java.util.ArrayList[Any](properties.size)
     val it = keys().iterator()
-    while (it.hasNext()) {
-      val key = it.next().asInstanceOf[TemplateScalarModel].getAsString()
+    while (it.hasNext) {
+      val key = it.next().asInstanceOf[TemplateScalarModel].getAsString
       values.add(get(key))
     }
-    return new CollectionAndSequence(new SimpleSequence(values, wrapper))
+    new CollectionAndSequence(new SimpleSequence(values, wrapper))
   }
 
-  override def isEmpty(): Boolean = {
+  override def isEmpty: Boolean = {
     `object` match {
-      case null                 => true
-      case s: String            => s.length() == 0
+      case null => true
+      case s: String => s.length() == 0
       case s: java.lang.Boolean => s == java.lang.Boolean.FALSE
-      case _                    => false
+      case _ => false
     }
   }
-  override def getAsString(): String = {
+
+  override def getAsString: String = {
     `object`.toString
   }
 }

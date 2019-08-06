@@ -18,22 +18,19 @@
  */
 package org.beangle.template.freemarker
 
-import freemarker.template.TemplateHashModelEx
-import freemarker.template.SimpleCollection
-import freemarker.template.TemplateModel
-import freemarker.template.TemplateCollectionModel
-import freemarker.template.SimpleScalar
-import java.{ util => ju }
-import freemarker.template.ObjectWrapper
+import java.{util => ju}
+
+import freemarker.template._
+
+import scala.jdk.javaapi.CollectionConverters.asJava
 
 class ParametersHashModel(val params: Map[String, Any], wrapper: ObjectWrapper) extends TemplateHashModelEx {
   override def get(key: String): TemplateModel = {
     params.get(key) match {
-      case Some(v) => {
+      case Some(v) =>
         if (v.getClass.isArray) {
           new SimpleScalar(v.asInstanceOf[Array[_]](0).asInstanceOf[String])
         } else new SimpleScalar(v.asInstanceOf[String])
-      }
       case None => null
     }
   }
@@ -47,8 +44,7 @@ class ParametersHashModel(val params: Map[String, Any], wrapper: ObjectWrapper) 
   }
 
   override def keys: TemplateCollectionModel = {
-    import scala.collection.JavaConverters._
-    new SimpleCollection(asJavaIterator(params.keys.iterator), wrapper)
+    new SimpleCollection(asJava(params.keys.iterator), wrapper)
   }
 
   override def values: TemplateCollectionModel = {
@@ -57,11 +53,13 @@ class ParametersHashModel(val params: Map[String, Any], wrapper: ObjectWrapper) 
       override def hasNext: Boolean = {
         iter.hasNext
       }
+
       override def next: Any = {
         params(iter.next)
       }
-      override def remove {
-        throw new UnsupportedOperationException();
+
+      override def remove(): Unit = {
+        throw new UnsupportedOperationException()
       }
     }
 

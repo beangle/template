@@ -22,7 +22,7 @@ import freemarker.template.{ ObjectWrapper, TemplateCollectionModel, TemplateMod
 import freemarker.template.TemplateHashModel
 import org.beangle.commons.bean.Properties
 
-class SeqModel(val seq: Seq[_], objectWrapper: ObjectWrapper) extends TemplateCollectionModel with TemplateSequenceModel with TemplateHashModel {
+class SeqModel(val seq: collection.Seq[_], objectWrapper: ObjectWrapper) extends TemplateCollectionModel with TemplateSequenceModel with TemplateHashModel {
 
   def get(key: String): TemplateModel = {
     objectWrapper.wrap(Properties.get(seq, key))

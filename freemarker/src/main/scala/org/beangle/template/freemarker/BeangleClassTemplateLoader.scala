@@ -42,7 +42,7 @@ object PrefixProcessor {
 
 class BeangleClassTemplateLoader(prefixStr: String = null) extends URLTemplateLoader {
 
-  val prefix = PrefixProcessor.process(prefixStr)
+  private val prefix = PrefixProcessor.process(prefixStr)
 
   protected def getURL(name: String): URL = {
     var url = ClassLoaders.getResource(name)

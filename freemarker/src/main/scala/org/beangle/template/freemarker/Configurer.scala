@@ -43,7 +43,7 @@ object Configurer {
 
   def newConfig(templatePath: String): Configuration = {
     val configurer = new Configurer
-    configurer.templatePath = templatePath;
+    configurer.templatePath = templatePath
     configurer.init()
     configurer.config
   }

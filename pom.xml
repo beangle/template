@@ -2,17 +2,17 @@
   <parent>
     <groupId>org.beangle</groupId>
     <artifactId>beangle-scala</artifactId>
-    <version>25.2</version>
+    <version>26.2</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.template</groupId>
-  <artifactId>beangle-template-parent_2.12</artifactId>
+  <artifactId>beangle-template-parent_2.13</artifactId>
   <version>0.0.24-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Beangle Template Parent</name>
 
   <properties>
-    <commons.version>5.1.5</commons.version>
+    <commons.version>5.1.8</commons.version>
     <freemarker.version>2.3.28</freemarker.version>
   </properties>
 
@@ -23,7 +23,7 @@
   <dependencies>
     <dependency>
       <groupId>org.beangle.commons</groupId>
-      <artifactId>beangle-commons-core_2.12</artifactId>
+      <artifactId>beangle-commons-core_2.13</artifactId>
       <version>${commons.version}</version>
     </dependency>
   </dependencies>
