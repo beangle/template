@@ -18,22 +18,17 @@
  */
 package org.beangle.template.freemarker
 
-import java.lang.reflect.Method
-
-import freemarker.ext.beans.BeansWrapper
-import freemarker.ext.beans._MethodUtil
-import freemarker.template.TemplateMethodModelEx
-import freemarker.template.TemplateModel
-import freemarker.template.TemplateModelException
+import freemarker.ext.beans.{BeansWrapper, _MethodUtil}
+import freemarker.template.{TemplateMethodModelEx, TemplateModel, TemplateModelException}
 import org.beangle.commons.lang.reflect.MethodInfo
 
 class SimpleMethodModel(obj: AnyRef, methodInfos: Seq[MethodInfo], wrapper: BeansWrapper)
-    extends TemplateMethodModelEx {
+  extends TemplateMethodModelEx {
 
   override def exec(arguments: java.util.List[_]): AnyRef = {
     try {
       val args = unwrapArguments(arguments, wrapper)
-      methodInfos.find(x => x.parameterTypes.size == arguments.size) match {
+      methodInfos.find(x => x.parameterTypes.length == arguments.size) match {
         case Some(x) =>
           val method = x.method
           val retval = method.invoke(obj, args: _*)

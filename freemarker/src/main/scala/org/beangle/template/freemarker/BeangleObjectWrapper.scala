@@ -19,20 +19,18 @@
 package org.beangle.template.freemarker
 
 import java.beans.PropertyDescriptor
-import java.lang.reflect.{ Method, Modifier }
-import java.time.{ Instant, LocalDate, LocalDateTime, LocalTime, ZoneId, ZonedDateTime }
+import java.lang.reflect.{Method, Modifier}
+import java.time._
 import java.time.temporal.Temporal
-import java.{ util => ju }
-
-import scala.collection.JavaConverters.{ asJavaCollection, mapAsJavaMap, setAsJavaSet }
-
-import org.beangle.commons.lang.Strings.{ substringAfter, uncapitalize }
+import java.{util => ju}
 
 import freemarker.core.CollectionAndSequence
-import freemarker.ext.beans.{ BeansWrapperConfiguration, MapModel, MethodAppearanceFineTuner }
-import freemarker.ext.beans.BeansWrapper.{ MethodAppearanceDecision, MethodAppearanceDecisionInput }
-import freemarker.ext.beans.BeansWrapper
-import freemarker.template.{ AdapterTemplateModel, Configuration, DefaultObjectWrapper, DefaultObjectWrapperConfiguration, SimpleCollection, SimpleDate, SimpleNumber, SimpleScalar, SimpleSequence, TemplateBooleanModel, TemplateCollectionModel, TemplateDateModel, TemplateHashModelEx, TemplateMethodModelEx, TemplateModel, TemplateModelAdapter }
+import freemarker.ext.beans.BeansWrapper.{MethodAppearanceDecision, MethodAppearanceDecisionInput}
+import freemarker.ext.beans.{BeansWrapper, BeansWrapperConfiguration, MapModel, MethodAppearanceFineTuner}
+import freemarker.template._
+import org.beangle.commons.lang.Strings.{substringAfter, uncapitalize}
+
+import scala.jdk.javaapi.CollectionConverters.asJava
 
 object BeangleObjectWrapper {
   def wrapperConfig(): BeansWrapperConfiguration = {
@@ -42,12 +40,12 @@ object BeangleObjectWrapper {
   }
 }
 
-class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wrapperConfig, false) {
+class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wrapperConfig(), false) {
 
   override def unwrap(model: TemplateModel, hint: Class[_]): AnyRef = {
     model match {
       case sm: SeqModel => sm.seq
-      case _            => super.unwrap(model, hint)
+      case _ => super.unwrap(model, hint)
     }
   }
 
@@ -55,59 +53,58 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
     if (null == obj || None == obj) return null
     obj match {
       //basic types
-      case s: String   => new SimpleScalar(s)
+      case s: String => new SimpleScalar(s)
       case num: Number => new SimpleNumber(num)
       case temporal: Temporal =>
         temporal match {
-          case t: Instant       => new SimpleDate(java.util.Date.from(t), TemplateDateModel.DATETIME)
+          case t: Instant => new SimpleDate(java.util.Date.from(t), TemplateDateModel.DATETIME)
           case t: ZonedDateTime => new SimpleDate(java.util.Date.from(t.toInstant), TemplateDateModel.DATETIME)
-          case t: LocalDateTime => new SimpleDate(java.util.Date.from(t.atZone(ZoneId.systemDefault()).toInstant()), TemplateDateModel.DATETIME)
-          case t: LocalDate     => new SimpleDate(java.sql.Date.valueOf(t), TemplateDateModel.DATE)
-          case t: LocalTime     => new SimpleDate(java.sql.Time.valueOf(t))
+          case t: LocalDateTime => new SimpleDate(java.util.Date.from(t.atZone(ZoneId.systemDefault()).toInstant), TemplateDateModel.DATETIME)
+          case t: LocalDate => new SimpleDate(java.sql.Date.valueOf(t), TemplateDateModel.DATE)
+          case t: LocalTime => new SimpleDate(java.sql.Time.valueOf(t))
         }
-      case date: ju.Date => {
+      case date: ju.Date =>
         date match {
-          case sdate: java.sql.Date           => new SimpleDate(sdate)
-          case stime: java.sql.Time           => new SimpleDate(stime)
+          case sdate: java.sql.Date => new SimpleDate(sdate)
+          case stime: java.sql.Time => new SimpleDate(stime)
           case stimestamp: java.sql.Timestamp => new SimpleDate(stimestamp)
-          case _                              => new SimpleDate(date, getDefaultDateType())
+          case _ => new SimpleDate(date, getDefaultDateType)
         }
-      }
-      case b: java.lang.Boolean         => if (b) TemplateBooleanModel.TRUE else TemplateBooleanModel.FALSE
+      case b: java.lang.Boolean => if (b) TemplateBooleanModel.TRUE else TemplateBooleanModel.FALSE
 
       //wrap types
-      case Some(p)                      => wrap(p.asInstanceOf[Object])
-      case tm: TemplateModel            => tm
+      case Some(p) => wrap(p.asInstanceOf[Object])
+      case tm: TemplateModel => tm
 
       // scala collections
-      case seq: collection.Seq[_]       => new SeqModel(seq, this)
-      case set: collection.Set[_]       => new SimpleSequence(setAsJavaSet(set), this)
-      case map: collection.Map[_, _]    => new FriendlyMapModel(mapAsJavaMap(map), this)
-      case iter: Iterable[_]            => new SimpleSequence(asJavaCollection(iter), this)
+      case seq: collection.Seq[_] => new SeqModel(seq, this)
+      case set: collection.Set[_] => new SimpleSequence(asJava(set), this)
+      case map: collection.Map[_, _] => new FriendlyMapModel(asJava(map), this)
+      case iter: Iterable[_] => new SimpleSequence(asJava(iter.toSeq), this)
 
       // java collections
-      case array: Array[_]              => new SimpleSequence(ju.Arrays.asList(array: _*), this)
+      case array: Array[_] => new SimpleSequence(ju.Arrays.asList(array: _*), this)
       case collection: ju.Collection[_] => new SimpleSequence(collection, this)
-      case map: ju.Map[_, _]            => new FriendlyMapModel(map, this)
-      case iter: ju.Iterator[_]         => new SimpleCollection(iter, this)
+      case map: ju.Map[_, _] => new FriendlyMapModel(map, this)
+      case iter: ju.Iterator[_] => new SimpleCollection(iter, this)
       // misc
-      case tma: TemplateModelAdapter    => tma.getTemplateModel
-      case node: org.w3c.dom.Node       => wrapDomNode(node)
-      case _                            => new StringModel(obj, this)
+      case tma: TemplateModelAdapter => tma.getTemplateModel
+      case node: org.w3c.dom.Node => wrapDomNode(node)
+      case _ => new StringModel(obj, this)
     }
   }
 }
 
 /**
- * Attempting to get the best of both worlds of FM's MapModel and
- * simplemapmodel, by reimplementing the isEmpty(), keySet() and values()
- * methods. ?keys and ?values built-ins are thus available, just as well as
- * plain Map methods.
- */
+  * Attempting to get the best of both worlds of FM's MapModel and
+  * simplemapmodel, by reimplementing the isEmpty(), keySet() and values()
+  * methods. ?keys and ?values built-ins are thus available, just as well as
+  * plain Map methods.
+  */
 class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends MapModel(map, wrapper) with TemplateHashModelEx
-    with TemplateMethodModelEx with AdapterTemplateModel {
+  with TemplateMethodModelEx with AdapterTemplateModel {
 
-  override def isEmpty(): Boolean = {
+  override def isEmpty: Boolean = {
     `object`.asInstanceOf[ju.Map[_, _]].isEmpty
   }
 
@@ -118,14 +115,13 @@ class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends MapMode
 
   // add feature
   override def values(): TemplateCollectionModel = {
-    new CollectionAndSequence(new SimpleSequence((`object`.asInstanceOf[ju.Map[_, _]]).values(), wrapper))
+    new CollectionAndSequence(new SimpleSequence(`object`.asInstanceOf[ju.Map[_, _]].values(), wrapper))
   }
 }
 
 class ScalaMethodAppearanceFineTuner extends MethodAppearanceFineTuner {
 
   def process(in: MethodAppearanceDecisionInput, decision: MethodAppearanceDecision): Unit = {
-    val clazz = in.getContainingClass
     val method = in.getMethod
     val name = method.getName
     if (name.equals("hashCode") || name.equals("toString")) return
@@ -139,7 +135,7 @@ class ScalaMethodAppearanceFineTuner extends MethodAppearanceFineTuner {
 
   private def propertyName(m: Method): Option[String] = {
     val name = m.getName
-    if (m.getParameterTypes.length == 0 && classOf[Unit] != m.getReturnType() && Modifier.isPublic(m.getModifiers)
+    if (m.getParameterTypes.length == 0 && classOf[Unit] != m.getReturnType && Modifier.isPublic(m.getModifiers)
       && !Modifier.isStatic(m.getModifiers) && !Modifier.isSynchronized(m.getModifiers)) {
       if (name.startsWith("get") && name.length > 3 && Character.isUpperCase(name.charAt(3))) Some(uncapitalize(substringAfter(name, "get")))
       else if (name.startsWith("is") && name.length > 2 && Character.isUpperCase(name.charAt(2))) Some(uncapitalize(substringAfter(name, "is")))
