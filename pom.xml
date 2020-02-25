@@ -13,7 +13,7 @@
 
   <properties>
     <commons.version>5.1.11</commons.version>
-    <freemarker.version>2.3.28</freemarker.version>
+    <freemarker.version>2.3.29</freemarker.version>
   </properties>
 
   <modules>
