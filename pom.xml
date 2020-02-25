@@ -7,13 +7,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.template</groupId>
   <artifactId>beangle-template-parent_2.13</artifactId>
-  <version>0.0.25</version>
+  <version>0.0.26</version>
   <packaging>pom</packaging>
   <name>Beangle Template Parent</name>
 
   <properties>
     <commons.version>5.1.11</commons.version>
-    <freemarker.version>2.3.28</freemarker.version>
+    <freemarker.version>2.3.29</freemarker.version>
   </properties>
 
   <modules>

@@ -74,6 +74,7 @@ class Configurer extends Initializing {
     config.setObjectWrapper(createObjectWrapper(props))
     config.setTemplateLoader(createTemplateLoader(props))
 
+    config.setSharedVariable("include_if_exists",new IncludeIfExistsModel)
     var content_type = config.getCustomAttribute("content_type").asInstanceOf[String]
     if (null == content_type) content_type = "text/html"
     if (!content_type.contains("charset"))
