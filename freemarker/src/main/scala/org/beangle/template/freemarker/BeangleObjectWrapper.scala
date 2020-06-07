@@ -34,7 +34,7 @@ import scala.jdk.javaapi.CollectionConverters.asJava
 
 object BeangleObjectWrapper {
   def wrapperConfig(): BeansWrapperConfiguration = {
-    val config = new DefaultObjectWrapperConfiguration(Configuration.VERSION_2_3_24) {}
+    val config = new DefaultObjectWrapperConfiguration(Configuration.VERSION_2_3_30) {}
     config.setMethodAppearanceFineTuner(new ScalaMethodAppearanceFineTuner)
     config
   }
