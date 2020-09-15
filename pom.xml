@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.beangle</groupId>
     <artifactId>beangle-scala</artifactId>
-    <version>27.1</version>
+    <version>28.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.template</groupId>
@@ -12,7 +12,7 @@
   <name>Beangle Template Parent</name>
 
   <properties>
-    <commons.version>5.1.17</commons.version>
+    <commons.version>5.2.0</commons.version>
     <freemarker.version>2.3.30</freemarker.version>
   </properties>
 
