@@ -46,7 +46,7 @@ class SeqModel(val seq: collection.Seq[_], objectWrapper: ObjectWrapper) extends
 
   class SeqTemplateModelIterator(val iter: Iterator[_], objectWrapper: ObjectWrapper) extends TemplateModelIterator {
     override def next(): TemplateModel = {
-      objectWrapper.wrap(iter.next)
+      objectWrapper.wrap(iter.next())
     }
 
     def hasNext: Boolean = {
