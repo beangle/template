@@ -54,8 +54,8 @@ class ParametersHashModel(val params: Map[String, Any], wrapper: ObjectWrapper) 
         iter.hasNext
       }
 
-      override def next: Any = {
-        params(iter.next)
+      override def next(): Any = {
+        params(iter.next())
       }
 
       override def remove(): Unit = {
