@@ -18,16 +18,15 @@
  */
 package org.beangle.template.freemarker
 
-import java.io.{ File, IOException }
-
+import freemarker.cache.{FileTemplateLoader, MultiTemplateLoader, TemplateLoader}
+import freemarker.template.{Configuration, ObjectWrapper, TemplateExceptionHandler}
 import org.beangle.commons.bean.Initializing
 import org.beangle.commons.io.IOs
 import org.beangle.commons.lang.ClassLoaders
-import org.beangle.commons.lang.Strings.{ split, substringAfter }
+import org.beangle.commons.lang.Strings.{split, substringAfter}
 import org.beangle.commons.lang.annotation.description
 
-import freemarker.cache.{ FileTemplateLoader, MultiTemplateLoader, TemplateLoader }
-import freemarker.template.{ Configuration, ObjectWrapper, TemplateExceptionHandler }
+import java.io.{File, IOException}
 
 object Configurer {
 
@@ -52,7 +51,7 @@ object Configurer {
 @description("Freemarker配置提供者")
 class Configurer extends Initializing {
 
-  val config = new Configuration(Configuration.VERSION_2_3_28)
+  val config = new Configuration(Configuration.VERSION_2_3_30)
 
   var contentType: String = _
 
@@ -65,6 +64,10 @@ class Configurer extends Initializing {
     config.setDefaultEncoding("UTF-8")
     config.setLocalizedLookup(false)
     config.setWhitespaceStripping(true)
+    config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX)
+    // Disable auto imports and includes
+    config.setAutoImports(new java.util.HashMap(0))
+    config.setAutoIncludes(new java.util.ArrayList(0))
 
     val props = properties
     for ((key, value) <- props) {
@@ -74,7 +77,7 @@ class Configurer extends Initializing {
     config.setObjectWrapper(createObjectWrapper(props))
     config.setTemplateLoader(createTemplateLoader(props))
 
-    config.setSharedVariable("include_if_exists",new IncludeIfExistsModel)
+    config.setSharedVariable("include_if_exists", new IncludeIfExistsModel)
     var content_type = config.getCustomAttribute("content_type").asInstanceOf[String]
     if (null == content_type) content_type = "text/html"
     if (!content_type.contains("charset"))
@@ -94,24 +97,27 @@ class Configurer extends Initializing {
    */
   def createTemplateLoader(props: Map[String, String]): TemplateLoader = {
     if (null == templatePath) templatePath = props.getOrElse("template_path", "class://")
-    val paths: Array[String] = split(templatePath, ",")
+    val paths = split(templatePath, ",")
     val loaders = new collection.mutable.ListBuffer[TemplateLoader]
     for (path <- paths) {
-      if (path.startsWith("class://")) {
-        loaders += new BeangleClassTemplateLoader(substringAfter(path, "class://"))
-      } else if (path.startsWith("file://")) {
-        try {
-          loaders += new FileTemplateLoader(new File(substringAfter(path, "file://")))
-        } catch {
-          case e: IOException =>
-            throw new RuntimeException("templatePath: " + path + " cannot be accessed", e)
-        }
-      } else {
-        throw new RuntimeException("templatePath: " + path
-          + " is not well-formed. Use [class://|file://] seperated with ,")
-      }
+      loaders += buildLoader(path)
     }
     if (loaders.size == 1) loaders.head else new MultiTemplateLoader(loaders.toArray[TemplateLoader])
+  }
+
+  def buildLoader(path: String): TemplateLoader = {
+    if (path.startsWith("class://")) {
+      new BeangleClassTemplateLoader(substringAfter(path, "class://"))
+    } else if (path.startsWith("file://")) {
+      try {
+        new FileTemplateLoader(new File(substringAfter(path, "file://")))
+      } catch {
+        case e: IOException => throw new RuntimeException("templatePath: " + path + " cannot be accessed", e)
+      }
+    } else {
+      throw new RuntimeException("templatePath: " + path
+        + " is not well-formed. Use [class://|file://] seperated with ,")
+    }
   }
 
   def createObjectWrapper(props: Map[String, String]): ObjectWrapper = {
@@ -119,6 +125,7 @@ class Configurer extends Initializing {
     wrapper.setUseCache(false)
     wrapper
   }
+
   /**
    * Load the multi settings from the /META-INF/freemarker.properties and
    * /freemarker.properties file on the classpath

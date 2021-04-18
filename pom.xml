@@ -13,7 +13,8 @@
 
   <properties>
     <commons.version>5.2.1</commons.version>
-    <freemarker.version>2.3.30</freemarker.version>
+    <cdi.version>0.2.4</cdi.version>
+    <freemarker.version>2.3.31</freemarker.version>
   </properties>
 
   <modules>
@@ -25,6 +26,23 @@
       <groupId>org.beangle.commons</groupId>
       <artifactId>beangle-commons-core_2.13</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.beangle.commons</groupId>
+      <artifactId>beangle-commons-web_2.13</artifactId>
+      <version>${commons.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.beangle.cdi</groupId>
+      <artifactId>beangle-cdi-api_2.13</artifactId>
+      <version>${cdi.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>
