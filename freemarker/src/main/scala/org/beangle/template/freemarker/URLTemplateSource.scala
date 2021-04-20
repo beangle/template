@@ -25,15 +25,12 @@ import java.net.{JarURLConnection, URL, URLConnection}
  * Wraps a {@link URL}, and implements methods required for a typical template source.
  * because freemarker URLTemplateSource is just package protected,not public.
  */
-class URLTemplateSource(val url: URL, useCaches: Option[Boolean]) {
+class URLTemplateSource(val url: URL) {
 
   private var conn: URLConnection = null
   private var inputStream: InputStream = null
 
   this.conn = url.openConnection
-  useCaches foreach { a =>
-    conn.setUseCaches(a)
-  }
 
   override def equals(o: Any): Boolean = {
     o match {

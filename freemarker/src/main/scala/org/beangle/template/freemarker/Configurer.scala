@@ -107,13 +107,15 @@ class Configurer extends Initializing {
 
   def buildLoader(path: String): TemplateLoader = {
     if (path.startsWith("class://")) {
-      new BeangleClassTemplateLoader(substringAfter(path, "class://"))
+      new PrefixClassTemplateLoader(substringAfter(path, "class://"))
     } else if (path.startsWith("file://")) {
       try {
         new FileTemplateLoader(new File(substringAfter(path, "file://")))
       } catch {
         case e: IOException => throw new RuntimeException("templatePath: " + path + " cannot be accessed", e)
       }
+    } else if (path.startsWith("http://")) {
+      new HttpTemplateLoader(path)
     } else {
       throw new RuntimeException("templatePath: " + path
         + " is not well-formed. Use [class://|file://] seperated with ,")

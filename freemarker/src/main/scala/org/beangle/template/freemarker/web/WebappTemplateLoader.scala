@@ -48,8 +48,7 @@ object WebappTemplateLoader {
 
 class WebappTemplateLoader(val servletContext: ServletContext, val subdirPath: String) extends TemplateLoader {
   private val LOG = Logger.getLogger("freemarker.cache")
-  var urlConnectionUsesCaches = false
-  var attemptFileAccess = true
+  private val attemptFileAccess = (null != servletContext.getRealPath(subdirPath))
 
   @throws[IOException]
   def findTemplateSource(name: String): Any = {
@@ -75,7 +74,7 @@ class WebappTemplateLoader(val servletContext: ServletContext, val subdirPath: S
         return null
     }
     if (url == null) null
-    else new URLTemplateSource(url, Some(urlConnectionUsesCaches))
+    else new URLTemplateSource(url)
   }
 
   def getLastModified(templateSource: Any): Long = {
