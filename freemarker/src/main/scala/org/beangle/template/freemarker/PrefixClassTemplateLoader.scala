@@ -23,10 +23,10 @@ import org.beangle.commons.lang.Strings
 import org.beangle.commons.lang.ClassLoaders
 import java.net.URL
 
-object PrefixProcessor {
+object PrefixClassTemplateLoader {
 
   /** Not starts with /,but end with / */
-  def process(pre: String): String = {
+  private def process(pre: String): String = {
     if (Strings.isBlank(pre)) return null
     var prefix = pre.trim()
 
@@ -40,9 +40,9 @@ object PrefixProcessor {
   }
 }
 
-class BeangleClassTemplateLoader(prefixStr: String = null) extends URLTemplateLoader {
+class PrefixClassTemplateLoader(prefixStr: String = null) extends URLTemplateLoader {
 
-  private val prefix = PrefixProcessor.process(prefixStr)
+  private val prefix = PrefixClassTemplateLoader.process(prefixStr)
 
   protected def getURL(name: String): URL = {
     var url = ClassLoaders.getResource(name)
