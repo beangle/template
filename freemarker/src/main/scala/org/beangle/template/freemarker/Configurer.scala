@@ -85,6 +85,11 @@ class Configurer extends Initializing {
     contentType = content_type
   }
 
+  protected def detectTemplatePath(props: Map[String, String]): String = {
+    if (null == templatePath) templatePath = props.getOrElse("template_path", "class://")
+    templatePath
+  }
+
   /**
    * The default template loader is a MultiTemplateLoader which includes
    * BeangleClassTemplateLoader(classpath:) and a WebappTemplateLoader
@@ -96,8 +101,7 @@ class Configurer extends Initializing {
    * <p/>
    */
   def createTemplateLoader(props: Map[String, String]): TemplateLoader = {
-    if (null == templatePath) templatePath = props.getOrElse("template_path", "class://")
-    val paths = split(templatePath, ",")
+    val paths = split(detectTemplatePath(props), ",")
     val loaders = new collection.mutable.ListBuffer[TemplateLoader]
     for (path <- paths) {
       loaders += buildLoader(path)
@@ -114,7 +118,7 @@ class Configurer extends Initializing {
       } catch {
         case e: IOException => throw new RuntimeException("templatePath: " + path + " cannot be accessed", e)
       }
-    } else if (path.startsWith("http://")) {
+    } else if (path.startsWith("http://") || path.startsWith("https://")) {
       new HttpTemplateLoader(path)
     } else {
       throw new RuntimeException("templatePath: " + path
@@ -131,7 +135,6 @@ class Configurer extends Initializing {
   /**
    * Load the multi settings from the /META-INF/freemarker.properties and
    * /freemarker.properties file on the classpath
-   *
    * @see freemarker.template.Configuration#setSettings for the definition of valid settings
    */
   def properties: Map[String, String] = {

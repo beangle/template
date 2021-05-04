@@ -20,6 +20,7 @@ package org.beangle.template.freemarker
 
 import freemarker.cache.TemplateLoader
 import org.beangle.commons.lang.Strings
+import org.beangle.commons.net.http.HttpUtils
 
 import java.io.{IOException, InputStreamReader}
 import java.net.URL
@@ -29,8 +30,8 @@ class HttpTemplateLoader(val pattern: String) extends TemplateLoader {
   @throws[IOException]
   override def findTemplateSource(name: String): Any = {
     val url = getURL(name)
-    if (url == null) null
-    else new URLTemplateSource(url)
+    val status = HttpUtils.access(url)
+    if (status.isOk) new URLTemplateSource(url) else null
   }
 
   override def getLastModified(templateSource: Any): Long = {
