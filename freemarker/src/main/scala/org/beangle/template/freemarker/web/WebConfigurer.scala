@@ -27,7 +27,7 @@ import org.beangle.template.freemarker.Configurer
  * @author chaostone
  */
 class WebConfigurer extends Configurer {
-  override def createTemplateLoader(props: Map[String, String]): TemplateLoader = {
+  protected override def detectTemplatePath(props: Map[String, String]): String = {
     if (null == templatePath) {
       templatePath = ServletContextHolder.context.getInitParameter("templatePath")
     }
@@ -35,7 +35,11 @@ class WebConfigurer extends Configurer {
       templatePath = props.getOrElse("template_path", "class://")
     }
     if (null == templatePath) templatePath = "class://"
-    val paths = split(templatePath, ",")
+    templatePath
+  }
+
+  override def createTemplateLoader(props: Map[String, String]): TemplateLoader = {
+    val paths = split(detectTemplatePath(props), ",")
     val loaders = new collection.mutable.ListBuffer[TemplateLoader]
     for (path <- paths) {
       if (path.startsWith("webapp://")) {

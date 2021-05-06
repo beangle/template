@@ -20,17 +20,32 @@ package org.beangle.template.freemarker
 
 import freemarker.cache.TemplateLoader
 import org.beangle.commons.lang.Strings
+import org.beangle.commons.net.http.HttpUtils
 
-import java.io.{IOException, InputStreamReader}
+import java.io.{IOException, InputStreamReader, Reader}
 import java.net.URL
 
-class HttpTemplateLoader(val pattern: String) extends TemplateLoader {
+class HttpTemplateLoader(val pattern: String, preload: Boolean) extends TemplateLoader {
+  private var files: Set[String] = Set.empty
+
+  if (preload) {
+    loadList()
+  }
+
+  private def loadList(): Unit = {
+    val url = getURL("files")
+    files = Strings.split(HttpUtils.getText(url).getText).toSet
+  }
 
   @throws[IOException]
   override def findTemplateSource(name: String): Any = {
-    val url = getURL(name)
-    if (url == null) null
-    else new URLTemplateSource(url)
+    if (preload) {
+      if (files.contains(name)) new URLTemplateSource(new URL(getURL(name))) else null
+    } else {
+      val url = new URL(getURL(name))
+      val status = HttpUtils.access(url)
+      if (status.isOk) new URLTemplateSource(url) else null
+    }
   }
 
   override def getLastModified(templateSource: Any): Long = {
@@ -38,7 +53,7 @@ class HttpTemplateLoader(val pattern: String) extends TemplateLoader {
   }
 
   @throws[IOException]
-  override def getReader(templateSource: Any, encoding: String) = {
+  override def getReader(templateSource: Any, encoding: String): Reader = {
     new InputStreamReader(templateSource.asInstanceOf[URLTemplateSource].getInputStream, encoding)
   }
 
@@ -47,7 +62,12 @@ class HttpTemplateLoader(val pattern: String) extends TemplateLoader {
     templateSource.asInstanceOf[URLTemplateSource].close()
   }
 
-  protected def getURL(name: String): URL = {
-    new URL(Strings.replace(pattern, "{path}", name))
+  /**
+   * get url corresponding to name
+   * @param name shoudnot starts with /
+   * @return
+   */
+  protected def getURL(name: String): String = {
+    Strings.replace(pattern, "{path}", name)
   }
 }
