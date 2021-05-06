@@ -119,7 +119,7 @@ class Configurer extends Initializing {
         case e: IOException => throw new RuntimeException("templatePath: " + path + " cannot be accessed", e)
       }
     } else if (path.startsWith("http://") || path.startsWith("https://")) {
-      new HttpTemplateLoader(path)
+      new HttpTemplateLoader(path,enableCache)
     } else {
       throw new RuntimeException("templatePath: " + path
         + " is not well-formed. Use [class://|file://] seperated with ,")
