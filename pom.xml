@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.beangle.template</groupId>
   <artifactId>beangle-template-parent_2.13</artifactId>
-  <version>0.0.31-SNAPSHOT</version>
+  <version>0.0.31</version>
   <packaging>pom</packaging>
   <name>Beangle Template Parent</name>
 
