@@ -33,7 +33,7 @@ class HttpTemplateLoader(val pattern: String, preload: Boolean) extends Template
   }
 
   private def loadList(): Unit = {
-    val url = getURL("files")
+    val url = getURL("ls")
     files = Strings.split(HttpUtils.getText(url).getText).toSet
   }
 
