@@ -33,8 +33,11 @@ class HttpTemplateLoader(val pattern: String, preload: Boolean) extends Template
   }
 
   private def loadList(): Unit = {
-    val url = getURL("files")
-    files = Strings.split(HttpUtils.getText(url).getText).toSet
+    val url = getURL("ls")
+    val res = HttpUtils.getText(url)
+    if (res.isOk) {
+      files = Strings.split(res.getText).toSet
+    }
   }
 
   @throws[IOException]
@@ -64,6 +67,7 @@ class HttpTemplateLoader(val pattern: String, preload: Boolean) extends Template
 
   /**
    * get url corresponding to name
+   *
    * @param name shoudnot starts with /
    * @return
    */
