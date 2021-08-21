@@ -15,29 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.beangle.template.freemarker.web
+package org.beangle.template.api
 
-import freemarker.template.{ObjectWrapper, SimpleHash, TemplateModel}
-import jakarta.servlet.http.HttpServletRequest
+trait Tag {
 
-/**
- * Just extract value from default scope and request(omit session/context)
- */
-class SimpleHttpScopeHashModel(wrapper: ObjectWrapper, val request: HttpServletRequest) extends SimpleHash(wrapper) {
-
-  override def get(key: String): TemplateModel = {
-    // Lookup in page scope
-    val model = super.get(key)
-    if (model != null) {
-      return model
-    }
-
-    // Lookup in request scope
-    val obj = request.getAttribute(key)
-    if (obj != null) {
-      return wrap(obj)
-    }
-    // return wrapper's null object (probably null).
-    wrap(null)
-  }
 }

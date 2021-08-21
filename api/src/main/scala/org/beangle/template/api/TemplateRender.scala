@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.beangle.template.freemarker
+package org.beangle.template.api
 
-import freemarker.template.{Configuration, SimpleHash, Template}
-import org.beangle.template.api.TemplateRender
+import java.io.{StringWriter, Writer}
 
-import java.io.Writer
+trait TemplateRender {
 
-class DefaultTemplateRender(configuration: Configuration, template: Template) extends TemplateRender {
+  def renderTo(model: Any, writer: Writer): Unit
 
-  @throws(classOf[Exception])
-  override def renderTo(model: Any, writer: Writer): Unit = {
-    template.process(model, writer)
+  final def render(model: Any): String = {
+    val sw = new StringWriter()
+    renderTo(model, sw)
+    sw.toString
   }
 }

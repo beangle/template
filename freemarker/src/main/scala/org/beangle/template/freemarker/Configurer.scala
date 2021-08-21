@@ -54,12 +54,11 @@ class Configurer extends Initializing {
 
   var contentType: String = _
 
-  var enableCache = true
+  var devMode = true
 
   var templatePath: String = _
 
   override def init(): Unit = {
-    config.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER)
     config.setDefaultEncoding("UTF-8")
     config.setLocalizedLookup(false)
     config.setWhitespaceStripping(true)
@@ -118,7 +117,7 @@ class Configurer extends Initializing {
         case e: IOException => throw new RuntimeException("templatePath: " + path + " cannot be accessed", e)
       }
     } else if (path.startsWith("http://") || path.startsWith("https://")) {
-      new HttpTemplateLoader(path,enableCache)
+      new HttpTemplateLoader(path, !devMode)
     } else {
       throw new RuntimeException("templatePath: " + path
         + " is not well-formed. Use [class://|file://] seperated with ,")
@@ -134,6 +133,7 @@ class Configurer extends Initializing {
   /**
    * Load the multi settings from the /META-INF/freemarker.properties and
    * /freemarker.properties file on the classpath
+   *
    * @see freemarker.template.Configuration#setSettings for the definition of valid settings
    */
   def properties: Map[String, String] = {
@@ -154,7 +154,12 @@ class Configurer extends Initializing {
       val value: String = sysProps.getProperty(key)
       if (key.startsWith("freemarker.")) properties.put(substringAfter(key, "freemarker."), value)
     }
-    if (!enableCache) properties.put(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "0")
+    if (devMode) {
+      properties.put(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "0")
+      properties.put("template_exception_handler", "html_debug")
+    } else {
+      properties.put("template_exception_handler", "rethrow")
+    }
     properties.toMap
   }
 

@@ -21,7 +21,7 @@ import freemarker.core.ParseException
 import freemarker.template.{Configuration, Template}
 import org.beangle.commons.lang.Throwables
 import org.beangle.commons.logging.Logging
-import org.beangle.template.core.{TemplateEngine, TemplateRender}
+import org.beangle.template.api.{TemplateEngine, TemplateRender}
 
 import java.io.IOException
 

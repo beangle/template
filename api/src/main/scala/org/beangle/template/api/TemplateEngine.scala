@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.beangle.template.core
+package org.beangle.template.api
 
 import java.io.{StringWriter, Writer}
 
@@ -31,4 +31,10 @@ trait TemplateEngine {
   def forTemplate(template: String): TemplateRender
 
   def suffix: String
+
+}
+
+trait TagTemplateEngine extends TemplateEngine{
+
+  def newTag(context: ComponentContext,clazz: Class[_ <: Component]): Tag
 }

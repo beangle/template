@@ -1,6 +1,9 @@
 import Dependencies._
 import BuildSettings._
 
+ThisBuild / organization := "org.beangle.template"
+ThisBuild / version := "0.0.33"
+
 ThisBuild / scmInfo := Some(
   ScmInfo(
     url("https://github.com/beangle/template"),
@@ -22,13 +25,21 @@ ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html")
 
 lazy val root = (project in file("."))
   .settings()
-  .aggregate(freemarker)
+  .aggregate(api,freemarker)
+
+
+lazy val api = (project in file("api"))
+  .settings(
+    name := "beangle-template-api",
+    commonSettings,
+    libraryDependencies ++= (commonDeps)
+  )
 
 lazy val freemarker = (project in file("freemarker"))
   .settings(
     name := "beangle-template-freemarker",
     commonSettings,
-    libraryDependencies ++= (commonDeps)
-  )
+    libraryDependencies ++= (commonDeps ++ Seq(Dependencies.freemarker))
+  ).dependsOn(api)
 
 publish / skip := true

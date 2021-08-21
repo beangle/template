@@ -29,31 +29,31 @@ class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`ob
   override def get(key: String): TemplateModel = {
     if (key == "class") {
       wrapper.wrap(`object`.getClass)
-    }
-    else {
-      val clazzName = `object`.getClass.getName
-      if (clazzName.startsWith("java.") || clazzName.startsWith("scala.")) {
-        super.get(key)
-      } else {
-        BeanInfos.load(`object`.getClass).getGetter(key) match {
+    } else {
+      if (BeanInfos.cached(`object`.getClass)) then
+        val bi = BeanInfos.get(`object`.getClass)
+        bi.getGetter(key) match {
           case Some(s) => wrapper.wrap(s.invoke(`object`))
-          case None => wrapper.wrap(null)
+          case None => bi.methods.get(key).headOption match {
+            case Some(h) => new SimpleMethodModel(`object`, h, wrapper)
+            case None => wrapper.wrap(null)
+          }
         }
-      }
+      else super.get(key)
     }
   }
 
   override def size(): Int = {
-    BeanInfos.load(`object`.getClass).properties.size
+    BeanInfos.get(`object`.getClass).properties.size
   }
 
   override def keys(): TemplateCollectionModel = {
-    val properties = BeanInfos.load(`object`.getClass).properties
+    val properties = BeanInfos.get(`object`.getClass).properties
     new CollectionAndSequence(new SimpleSequence(asJava(properties.keySet), wrapper))
   }
 
   override def values(): TemplateCollectionModel = {
-    val properties = BeanInfos.load(`object`.getClass).properties
+    val properties = BeanInfos.get(`object`.getClass).properties
     val values = new java.util.ArrayList[Any](properties.size)
     val it = keys().iterator()
     while (it.hasNext) {

@@ -15,17 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.beangle.template.core
+package org.beangle.template.api
 
-import java.io.{StringWriter, Writer}
+import java.{util => ju}
 
-trait TemplateRender {
+/**
+ * New taglibrary.
+ */
+abstract class AbstractModels(val context: ComponentContext) {
 
-  def renderTo(model: Any, writer: Writer): Unit
+  val models = new ju.HashMap[Class[_], Tag]
 
-  final def render(model: Any): String = {
-    val sw = new StringWriter()
-    renderTo(model, sw)
-    sw.toString
+  protected def get(clazz: Class[_ <: Component]): Tag = {
+    var model = models.get(clazz)
+    if (null == model) {
+      model = context.engine.newTag(context,clazz)
+      models.put(clazz, model)
+    }
+    model
   }
 }

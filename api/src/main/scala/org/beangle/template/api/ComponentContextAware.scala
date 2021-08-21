@@ -15,17 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.beangle.template.freemarker
+package org.beangle.template.api
 
-import freemarker.template.{Configuration, SimpleHash, Template}
-import org.beangle.template.api.TemplateRender
-
-import java.io.Writer
-
-class DefaultTemplateRender(configuration: Configuration, template: Template) extends TemplateRender {
-
-  @throws(classOf[Exception])
-  override def renderTo(model: Any, writer: Writer): Unit = {
-    template.process(model, writer)
-  }
+trait ComponentContextAware {
+  def context: ComponentContext
 }

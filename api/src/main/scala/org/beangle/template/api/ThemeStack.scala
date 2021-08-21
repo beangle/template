@@ -15,17 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.beangle.template.freemarker
+package org.beangle.template.api
 
-import freemarker.template.{Configuration, SimpleHash, Template}
-import org.beangle.template.api.TemplateRender
+import java.util as ju
 
-import java.io.Writer
+/**
+ * ui主体栈
+ * @author chaostone
+ */
+class ThemeStack {
+  private val themes = new ju.Stack[Theme]()
 
-class DefaultTemplateRender(configuration: Configuration, template: Template) extends TemplateRender {
+  def push(item: Theme): Theme = themes.push(item)
 
-  @throws(classOf[Exception])
-  override def renderTo(model: Any, writer: Writer): Unit = {
-    template.process(model, writer)
-  }
+  def pop(): Theme = themes.pop()
+
+  def peek(): Theme = themes.peek()
+
+  def isEmpty: Boolean = themes.isEmpty
+
 }

@@ -20,6 +20,7 @@ package org.beangle.template.freemarker
 import freemarker.ext.beans.{BeansWrapper, _MethodUtil}
 import freemarker.template.{TemplateMethodModelEx, TemplateModel, TemplateModelException}
 import org.beangle.commons.lang.reflect.BeanInfo
+import org.beangle.commons.lang.reflect.BeanInfo.MethodInfo
 
 class SimpleMethodModel(obj: AnyRef, methodInfos: Seq[BeanInfo.MethodInfo], wrapper: BeansWrapper)
   extends TemplateMethodModelEx {
@@ -27,7 +28,7 @@ class SimpleMethodModel(obj: AnyRef, methodInfos: Seq[BeanInfo.MethodInfo], wrap
   override def exec(arguments: java.util.List[_]): AnyRef = {
     try {
       val args = unwrapArguments(arguments, wrapper)
-      methodInfos.find(x => x.parameters.length == arguments.size) match {
+      findMethod(args) match {
         case Some(x) =>
           val method = x.method
           val retval = method.invoke(obj, args: _*)
@@ -40,6 +41,19 @@ class SimpleMethodModel(obj: AnyRef, methodInfos: Seq[BeanInfo.MethodInfo], wrap
       case e: TemplateModelException => throw e
       case e: Exception =>
         throw _MethodUtil.newInvocationTemplateModelException(obj, methodInfos.head.method, e);
+    }
+  }
+
+  def findMethod(args: Array[AnyRef]): Option[MethodInfo] = {
+    if (methodInfos.size == 1) {
+      methodInfos.headOption
+    } else {
+      val sameLength = methodInfos.filter(_.parameters.length == args.length)
+      if (sameLength.size == args.size) {
+        sameLength.headOption
+      } else {
+        sameLength.find(x => x.matches(args: _*))
+      }
     }
   }
 
