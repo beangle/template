@@ -69,7 +69,7 @@ class UIBean(context: ComponentContext) extends Component(context) {
       case null => null
       case map: collection.Map[_, _] => map.asInstanceOf[collection.Map[String, Any]].get(property).orNull
       case javaMap: ju.Map[_, _] => javaMap.get(property)
-      case o: AnyRef => Properties.get(o, property)
+      case o: AnyRef => Properties.get[Any](o, property)
     }
   }
 
