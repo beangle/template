@@ -1,5 +1,5 @@
-import Dependencies._
-import BuildSettings._
+import org.beangle.parent.Dependencies._
+import org.beangle.parent.Settings._
 
 ThisBuild / organization := "org.beangle.template"
 ThisBuild / version := "0.0.33"
@@ -23,23 +23,27 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Commons Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
+val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % "5.2.5"
+val beangle_commons_text = "org.beangle.commons" %% "beangle-commons-text" % "5.2.5"
+val commonDeps = Seq(logback_classic, logback_core, scalatest, beangle_commons_core,beangle_commons_text)
+
 lazy val root = (project in file("."))
   .settings()
-  .aggregate(api,freemarker)
+  .aggregate(api,pfreemarker)
 
 
 lazy val api = (project in file("api"))
   .settings(
     name := "beangle-template-api",
-    commonSettings,
+    common,
     libraryDependencies ++= (commonDeps)
   )
 
-lazy val freemarker = (project in file("freemarker"))
+lazy val pfreemarker = (project in file("freemarker"))
   .settings(
     name := "beangle-template-freemarker",
-    commonSettings,
-    libraryDependencies ++= (commonDeps ++ Seq(Dependencies.freemarker))
+    common,
+    libraryDependencies ++= (commonDeps ++ Seq(freemarker))
   ).dependsOn(api)
 
 publish / skip := true
