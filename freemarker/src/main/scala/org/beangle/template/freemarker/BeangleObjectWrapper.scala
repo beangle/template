@@ -1,21 +1,20 @@
 /*
- * Beangle, Agile Development Scaffold and Toolkits.
- *
- * Copyright © 2005, The Beangle Software.
+ * Copyright (C) 2005, The Beangle Software.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.beangle.template.freemarker
 
 import java.beans.PropertyDescriptor
@@ -62,6 +61,7 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
           case t: LocalDateTime => new SimpleDate(java.util.Date.from(t.atZone(ZoneId.systemDefault()).toInstant), TemplateDateModel.DATETIME)
           case t: LocalDate => new SimpleDate(java.sql.Date.valueOf(t), TemplateDateModel.DATE)
           case t: LocalTime => new SimpleDate(java.sql.Time.valueOf(t))
+          case t: YearMonth => new SimpleDate(java.sql.Date.valueOf(t.atDay(1)))
         }
       case date: ju.Date =>
         date match {
@@ -96,11 +96,11 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
 }
 
 /**
-  * Attempting to get the best of both worlds of FM's MapModel and
-  * simplemapmodel, by reimplementing the isEmpty(), keySet() and values()
-  * methods. ?keys and ?values built-ins are thus available, just as well as
-  * plain Map methods.
-  */
+ * Attempting to get the best of both worlds of FM's MapModel and
+ * simplemapmodel, by reimplementing the isEmpty(), keySet() and values()
+ * methods. ?keys and ?values built-ins are thus available, just as well as
+ * plain Map methods.
+ */
 class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends MapModel(map, wrapper) with TemplateHashModelEx
   with TemplateMethodModelEx with AdapterTemplateModel {
 

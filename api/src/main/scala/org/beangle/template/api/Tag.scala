@@ -15,20 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.beangle.template.freemarker
+package org.beangle.template.api
 
-import org.beangle.commons.collection.page.SinglePage
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.funspec.AnyFunSpec
+trait Tag {
 
-class ObjectWrapperTest extends AnyFunSpec with Matchers {
-  describe("BeangleObjectWrapper") {
-    it("wrapper") {
-      val wrapper = new BeangleObjectWrapper()
-      val page = new SinglePage(2, 2, 100, List(21, 21))
-      val wrapped = wrapper.wrap(page)
-      val unwrapped = wrapper.unwrap(wrapped)
-      assert(unwrapped == page)
-    }
-  }
 }

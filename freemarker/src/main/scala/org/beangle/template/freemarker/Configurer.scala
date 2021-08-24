@@ -1,21 +1,20 @@
 /*
- * Beangle, Agile Development Scaffold and Toolkits.
- *
- * Copyright © 2005, The Beangle Software.
+ * Copyright (C) 2005, The Beangle Software.
  *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * it under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.beangle.template.freemarker
 
 import freemarker.cache.{FileTemplateLoader, MultiTemplateLoader, TemplateLoader}
@@ -51,16 +50,15 @@ object Configurer {
 @description("Freemarker配置提供者")
 class Configurer extends Initializing {
 
-  val config = new Configuration(Configuration.VERSION_2_3_30)
+  val config = new Configuration(Configuration.VERSION_2_3_31)
 
   var contentType: String = _
 
-  var enableCache = true
+  var devMode = true
 
   var templatePath: String = _
 
   override def init(): Unit = {
-    config.setTemplateExceptionHandler(TemplateExceptionHandler.HTML_DEBUG_HANDLER)
     config.setDefaultEncoding("UTF-8")
     config.setLocalizedLookup(false)
     config.setWhitespaceStripping(true)
@@ -119,7 +117,7 @@ class Configurer extends Initializing {
         case e: IOException => throw new RuntimeException("templatePath: " + path + " cannot be accessed", e)
       }
     } else if (path.startsWith("http://") || path.startsWith("https://")) {
-      new HttpTemplateLoader(path,enableCache)
+      new HttpTemplateLoader(path, !devMode)
     } else {
       throw new RuntimeException("templatePath: " + path
         + " is not well-formed. Use [class://|file://] seperated with ,")
@@ -135,6 +133,7 @@ class Configurer extends Initializing {
   /**
    * Load the multi settings from the /META-INF/freemarker.properties and
    * /freemarker.properties file on the classpath
+   *
    * @see freemarker.template.Configuration#setSettings for the definition of valid settings
    */
   def properties: Map[String, String] = {
@@ -155,7 +154,12 @@ class Configurer extends Initializing {
       val value: String = sysProps.getProperty(key)
       if (key.startsWith("freemarker.")) properties.put(substringAfter(key, "freemarker."), value)
     }
-    if (!enableCache) properties.put(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "0")
+    if (devMode) {
+      properties.put(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "0")
+      properties.put("template_exception_handler", "html_debug")
+    } else {
+      properties.put("template_exception_handler", "rethrow")
+    }
     properties.toMap
   }
 
