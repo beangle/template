@@ -23,7 +23,7 @@ import freemarker.template._
 
 import scala.jdk.javaapi.CollectionConverters.asJava
 
-class ParametersHashModel(val params: Map[String, Any], wrapper: ObjectWrapper) extends TemplateHashModelEx {
+class ParametersHashModel(val params: collection.Map[String, Any], wrapper: ObjectWrapper) extends TemplateHashModelEx {
   override def get(key: String): TemplateModel = {
     params.get(key) match {
       case Some(v) =>
