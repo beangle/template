@@ -47,3 +47,4 @@ lazy val pfreemarker = (project in file("freemarker"))
   ).dependsOn(api)
 
 publish / skip := true
+ThisBuild / Test / parallelExecution := false
