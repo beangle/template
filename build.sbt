@@ -20,7 +20,7 @@ ThisBuild / developers := List(
   )
 )
 
-ThisBuild / description := "The Beangle Commons Library"
+ThisBuild / description := "The Beangle Template Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
 val beangle_commons_ver="5.2.13"
