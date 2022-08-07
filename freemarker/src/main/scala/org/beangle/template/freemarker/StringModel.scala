@@ -32,7 +32,10 @@ class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`ob
         val bi = BeanInfos.get(`object`.getClass)
         bi.getGetter(key) match {
           case Some(s) => wrapper.wrap(s.invoke(`object`))
-          case None => super.get(key)
+          case None => bi.methods.get(key).headOption match {
+            case Some(h) => new SimpleMethodModel(`object`, h, wrapper)
+            case None => wrapper.wrap(null)
+          }
         }
       else super.get(key)
     }
