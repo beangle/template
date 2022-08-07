@@ -19,40 +19,44 @@ package org.beangle.template.freemarker
 
 import freemarker.ext.beans.{BeansWrapper, _MethodUtil}
 import freemarker.template.{TemplateMethodModelEx, TemplateModel, TemplateModelException}
-import org.beangle.commons.lang.reflect.BeanInfo
-import org.beangle.commons.lang.reflect.BeanInfo.MethodInfo
 
-class SimpleMethodModel(obj: AnyRef, methodInfos: Seq[BeanInfo.MethodInfo], wrapper: BeansWrapper)
+import java.lang.reflect.Method
+
+class SimpleMethodModel(obj: AnyRef, methods: Seq[Method], wrapper: BeansWrapper)
   extends TemplateMethodModelEx {
 
   override def exec(arguments: java.util.List[_]): AnyRef = {
     try {
       val args = unwrapArguments(arguments, wrapper)
       findMethod(args) match {
-        case Some(x) =>
-          val method = x.method
+        case Some(method) =>
           val retval = method.invoke(obj, args: _*)
           if (method.getReturnType == classOf[Unit])
             TemplateModel.NOTHING
-          else wrapper.wrap(retval);
+          else wrapper.wrap(retval)
         case None => null
       }
     } catch {
       case e: TemplateModelException => throw e
       case e: Exception =>
-        throw _MethodUtil.newInvocationTemplateModelException(obj, methodInfos.head.method, e);
+        throw _MethodUtil.newInvocationTemplateModelException(obj, methods.head, e);
     }
   }
 
-  def findMethod(args: Array[AnyRef]): Option[MethodInfo] = {
-    if (methodInfos.size == 1) {
-      methodInfos.headOption
+  def findMethod(args: Array[AnyRef]): Option[Method] = {
+    if (methods.size == 1) {
+      methods.headOption
     } else {
-      val sameLength = methodInfos.filter(_.parameters.length == args.length)
-      if (sameLength.size == args.size) {
-        sameLength.headOption
+      val paramCountMatched = methods.filter(_.getParameterCount == args.length)
+      if (paramCountMatched.size == 1) {
+        paramCountMatched.headOption
       } else {
-        sameLength.find(x => x.matches(args: _*))
+        paramCountMatched find { method =>
+          (0 until args.length).forall { i =>
+            val paramType = method.getParameterTypes()(i)
+            (args(i) == null && !paramType.isPrimitive) || (null != args(i) && paramType.isInstance(args(i)))
+          }
+        }
       }
     }
   }

@@ -22,15 +22,13 @@ import freemarker.ext.beans.{BeanModel, BeansWrapper}
 import freemarker.template.{SimpleSequence, TemplateCollectionModel, TemplateModel, TemplateScalarModel}
 import org.beangle.commons.lang.reflect.BeanInfos
 
-import scala.jdk.javaapi.CollectionConverters.asJava
-
 class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`object`, wrapper) with TemplateScalarModel {
 
   override def get(key: String): TemplateModel = {
     if (key == "class") {
       wrapper.wrap(`object`.getClass)
     } else {
-      if (BeanInfos.cached(`object`.getClass)) then
+      if BeanInfos.cached(`object`.getClass) then
         val bi = BeanInfos.get(`object`.getClass)
         bi.getGetter(key) match {
           case Some(s) => wrapper.wrap(s.invoke(`object`))
@@ -48,6 +46,7 @@ class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`ob
   }
 
   override def keys(): TemplateCollectionModel = {
+    import scala.jdk.javaapi.CollectionConverters.asJava
     val properties = BeanInfos.get(`object`.getClass).properties
     new CollectionAndSequence(new SimpleSequence(asJava(properties.keySet), wrapper))
   }
