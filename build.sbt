@@ -23,7 +23,7 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Template Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
-val beangle_commons_ver="5.4.1"
+val beangle_commons_ver="5.4.2"
 val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % beangle_commons_ver
 val beangle_commons_text = "org.beangle.commons" %% "beangle-commons-text" % beangle_commons_ver
 val commonDeps = Seq(logback_classic, logback_core, scalatest, beangle_commons_core,beangle_commons_text)

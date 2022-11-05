@@ -22,9 +22,11 @@ import org.beangle.commons.lang.Strings
 
 object Themes {
 
-  val Default = new Theme("html")
-
   private val themes = loadThemeProps()
+  private var defaultPrefix: String = null
+  val Default: Theme = loadDefault()
+
+  def list: List[String] = themes.keys.toList
 
   def getParentTemplate(template: String): String = {
     val start = template.indexOf('/', 1) + 1
@@ -39,19 +41,40 @@ object Themes {
   private def loadThemeProps(): Map[String, Theme] = {
     val themePropMap = new collection.mutable.HashMap[String, Theme]
     val resolver = new ResourcePatternResolver
-    val urls = resolver.getResources("template/*/theme.properties")
+    val urls = resolver.getResources("themes/**/theme.properties")
     urls foreach { url =>
-      val themeName = Strings.substringBetween(url.getPath, "template/", "/theme.properties")
-      val theme = new Theme(themeName)
-      val parent = IOs.readJavaProperties(url).get("parent").orNull
-      theme.parent = if (Strings.isEmpty(parent)) None else Some(parent.trim)
-      themePropMap.put(themeName, theme)
+      val themeName = Strings.substringBetween(url.getPath, "themes/", "/theme.properties")
+      var parent = IOs.readJavaProperties(url).get("parent").orNull
+      if Strings.isBlank(parent) then parent = null
+      if (themeName.contains("/") && Strings.isNotBlank(parent) && !parent.contains("/")) {
+        parent = Strings.substringBefore(themeName, "/") + "/" + parent.trim
+      }
+      themePropMap.put(themeName, Theme(themeName, Option(parent)))
     }
     themePropMap.toMap
   }
 
+  private def loadDefault(): Theme = {
+    val resolver = new ResourcePatternResolver
+    val urls = resolver.getResources("themes/default.properties")
+    val defaultTheme =
+      if (urls.isEmpty) {
+        val tops = themes.filter(_._2.parent.isEmpty)
+        if tops.size == 1 then tops.head._2 else Theme("notdefined")
+      } else {
+        val defaultName = IOs.readJavaProperties(urls.head).getOrElse("default", "notdefined")
+        Theme(defaultName)
+      }
+    defaultPrefix = defaultTheme.prefix
+    defaultTheme
+  }
+
   def apply(name: String): Theme = {
-    themes(name)
+    if (defaultPrefix == null) {
+      themes(name)
+    } else {
+      if name.contains("/") then themes(name) else themes(defaultPrefix + name)
+    }
   }
 
 }
@@ -59,14 +82,16 @@ object Themes {
 /**
  * name: Theme's name ,html,list,xhtml etc.
  */
-class Theme(val name: String) {
-
-  var parent: Option[String] = None
+class Theme(val name: String, val parent: Option[String] = None) {
 
   def getTemplatePath(clazz: Class[_], suffix: String): String = {
     val sb = new StringBuilder(20)
-    sb.append("/template/").append(name).append('/').append(Strings.uncapitalize(clazz.getSimpleName)).append(suffix)
+    sb.append("/themes/").append(name).append('/').append(Strings.uncapitalize(clazz.getSimpleName)).append(suffix)
     sb.toString()
+  }
+
+  def prefix: String = {
+    if name.contains("/") then Strings.substringBeforeLast(name,"/") + "/" else null
   }
 
   override def equals(obj: Any): Boolean = name.equals(obj.toString)
