@@ -17,39 +17,30 @@
 
 package org.beangle.template.freemarker
 
-import freemarker.template.{ ObjectWrapper, TemplateCollectionModel, TemplateModel, TemplateModelIterator, TemplateSequenceModel }
-import freemarker.template.TemplateHashModel
+import freemarker.ext.util.WrapperTemplateModel
+import freemarker.template.*
 import org.beangle.commons.bean.Properties
 
-class SeqModel(val seq: collection.Seq[_], objectWrapper: ObjectWrapper) extends TemplateCollectionModel with TemplateSequenceModel with TemplateHashModel {
+class SeqModel(val seq: collection.Seq[_], objectWrapper: ObjectWrapper) extends TemplateCollectionModel,
+  TemplateSequenceModel, TemplateHashModel, AdapterTemplateModel {
 
-  def get(key: String): TemplateModel = {
-    objectWrapper.wrap(Properties.get(seq, key))
-  }
+  override def getAdaptedObject(hint: Class[_]): Any = seq
 
-  def isEmpty: Boolean = {
-    seq.isEmpty
-  }
+  override def get(key: String): TemplateModel = objectWrapper.wrap(Properties.get(seq, key))
 
-  def get(index: Int): TemplateModel = {
-    objectWrapper.wrap(seq(index))
-  }
+  override def isEmpty: Boolean = seq.isEmpty
 
-  override def size: Int = {
-    seq.size
-  }
+  override def get(index: Int): TemplateModel = objectWrapper.wrap(seq(index))
+
+  override def size: Int = seq.size
 
   override def iterator: TemplateModelIterator = {
     new SeqTemplateModelIterator(seq.iterator, objectWrapper)
   }
 
   class SeqTemplateModelIterator(val iter: Iterator[_], objectWrapper: ObjectWrapper) extends TemplateModelIterator {
-    override def next(): TemplateModel = {
-      objectWrapper.wrap(iter.next())
-    }
+    override def next(): TemplateModel = objectWrapper.wrap(iter.next())
 
-    def hasNext: Boolean = {
-      iter.hasNext
-    }
+    def hasNext: Boolean = iter.hasNext
   }
 }
