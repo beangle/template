@@ -54,7 +54,7 @@ class Configurer extends Initializing {
 
   var contentType: String = _
 
-  var devMode = true
+  var devMode = false
 
   var templatePath: String = _
 

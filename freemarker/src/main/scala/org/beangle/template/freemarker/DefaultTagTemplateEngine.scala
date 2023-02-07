@@ -44,7 +44,7 @@ class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTempl
 
   val config = new Configuration(Configuration.VERSION_2_3_30)
 
-  var devMode: Boolean = true
+  var devMode: Boolean = false
 
   @throws(classOf[Exception])
   override def renderTo(template: String, component: Any, writer: Writer): Unit = {
