@@ -34,16 +34,16 @@ object Configurer {
   System.setProperty(freemarker.log.Logger.SYSTEM_PROPERTY_NAME_LOGGER_LIBRARY, freemarker.log.Logger.LIBRARY_NAME_NONE)
 
   def newConfig: Configuration = {
-    val configurer = new Configurer
-    configurer.init()
-    configurer.config
+    val cfg = new Configurer
+    cfg.init()
+    cfg.config
   }
 
   def newConfig(templatePath: String): Configuration = {
-    val configurer = new Configurer
-    configurer.templatePath = templatePath
-    configurer.init()
-    configurer.config
+    val cfg = new Configurer
+    cfg.templatePath = templatePath
+    cfg.init()
+    cfg.config
   }
 }
 
@@ -75,7 +75,7 @@ class Configurer extends Initializing {
     config.setObjectWrapper(createObjectWrapper(props))
     config.setTemplateLoader(createTemplateLoader(props))
 
-    config.setSharedVariable("include_if_exists", new IncludeIfExistsModel)
+    config.setSharedVariable("include_optional", new IncludeOptionalModel)
     var content_type = config.getCustomAttribute("content_type").asInstanceOf[String]
     if (null == content_type) content_type = "text/html"
     if (!content_type.contains("charset"))
@@ -104,12 +104,17 @@ class Configurer extends Initializing {
     for (path <- paths) {
       loaders += buildLoader(path)
     }
-    if (loaders.size == 1) loaders.head else new MultiTemplateLoader(loaders.toArray[TemplateLoader])
+    val loader = if (loaders.size == 1) loaders.head else new MultiTemplateLoader(loaders.toArray[TemplateLoader])
+    ProfileTemplateLoader(loader)
+  }
+
+  def cleanProfile(): Unit = {
+    ProfileTemplateLoader.profile.remove()
   }
 
   def buildLoader(path: String): TemplateLoader = {
     if (path.startsWith("class://")) {
-      new PrefixClassTemplateLoader(substringAfter(path, "class://"))
+      new ClassTemplateLoader(substringAfter(path, "class://"))
     } else if (path.startsWith("file://")) {
       try {
         new FileTemplateLoader(new File(substringAfter(path, "file://")))

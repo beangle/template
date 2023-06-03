@@ -20,7 +20,7 @@ package org.beangle.template.freemarker
 import freemarker.core.Environment
 import freemarker.template.{TemplateDirectiveBody, TemplateDirectiveModel, TemplateModel}
 
-class IncludeIfExistsModel extends TemplateDirectiveModel {
+class IncludeOptionalModel extends TemplateDirectiveModel {
 
   override def execute(env: Environment, map: java.util.Map[_, _], templateModel: Array[TemplateModel],
                        directiveBody: TemplateDirectiveBody): Unit = {
@@ -32,9 +32,7 @@ class IncludeIfExistsModel extends TemplateDirectiveModel {
     if (templateLoader.findTemplateSource(fullTemplatePath) != null) {
       env.include(env.getTemplateForInclusion(fullTemplatePath, null, true));
     } else {
-      if (directiveBody != null) {
-        directiveBody.render(env.getOut)
-      }
+      if directiveBody != null then directiveBody.render(env.getOut)
     }
   }
 }

@@ -24,9 +24,17 @@ import org.scalatest.matchers.should.Matchers
 class DefaultTemplateEngineTest extends AnyFunSpec with Matchers {
   describe(" DefaultTemplateEngine") {
     it("render") {
-      val template = DefaultTemplateEngine().forTemplate("/org/beangle/template/freemarker/test.ftl")
+      val template = DefaultTemplateEngine().forTemplate("/templates/test.ftl")
       val datas = Map("name" -> "world!")
       println(template.render(datas))
+    }
+
+    it("profile loader") {
+      ProfileTemplateLoader.profile.set("dev")
+      val template = DefaultTemplateEngine().forTemplate("/templates/index.ftl")
+      val datas = Map("name" -> "world!")
+      val html = template.render(datas)
+      assert(html.nonEmpty)
     }
   }
 }
