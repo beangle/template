@@ -80,7 +80,7 @@ class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTempl
 
     config.setCacheStorage(new StrongCacheStorage())
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX)
-    config.setSharedVariable("include_if_exists", new IncludeOptionalModel)
+    config.setSharedVariable("include_optional", new IncludeOptionalModel)
     // Disable auto imports and includes
     config.setAutoImports(new ju.HashMap(0))
     config.setAutoIncludes(new ju.ArrayList(0))
