@@ -109,7 +109,7 @@ class Configurer extends Initializing {
   }
 
   def cleanProfile(): Unit = {
-    ProfileTemplateLoader.profile.remove()
+    ProfileTemplateLoader.removeProfile()
   }
 
   def buildLoader(path: String): TemplateLoader = {

@@ -30,7 +30,7 @@ class DefaultTemplateEngineTest extends AnyFunSpec with Matchers {
     }
 
     it("profile loader") {
-      ProfileTemplateLoader.profile.set("dev")
+      ProfileTemplateLoader.setProfile("dev")
       val template = DefaultTemplateEngine().forTemplate("/templates/index.ftl")
       val datas = Map("name" -> "world!")
       val html = template.render(datas)

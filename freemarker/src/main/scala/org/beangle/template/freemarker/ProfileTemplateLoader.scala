@@ -26,7 +26,7 @@ import java.net.URL
 
 object ProfileTemplateLoader {
 
-  val profile = new ThreadLocal[String]
+  private val profile = new ThreadLocal[String]
 
   /** Not starts with /,but end with / */
   def process(pre: String): String = {
@@ -40,6 +40,17 @@ object ProfileTemplateLoader {
       prefix
   }
 
+  def setProfile(p: Any): Unit = {
+    p match
+      case null => profile.remove()
+      case None => profile.remove()
+      case name: String => if name.isBlank then profile.remove() else profile.set(process(name))
+      case _ => profile.set(process(p.toString))
+  }
+
+  def removeProfile(): Unit = {
+    profile.remove()
+  }
 }
 
 class ProfileTemplateLoader(loader: TemplateLoader) extends TemplateLoader {
@@ -48,7 +59,7 @@ class ProfileTemplateLoader(loader: TemplateLoader) extends TemplateLoader {
     val p = ProfileTemplateLoader.profile.get()
     if null == p then loader.findTemplateSource(name)
     else
-      val profiled = loader.findTemplateSource(process(p) + name)
+      val profiled = loader.findTemplateSource(p + name)
       if null == profiled then loader.findTemplateSource(name) else profiled
   }
 
