@@ -42,7 +42,7 @@ import java.util as ju
 @description("Freemarker Tag 模板引擎")
 class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTemplateEngine with TagTemplateEngine with Initializing {
 
-  val config = new Configuration(Configuration.VERSION_2_3_30)
+  val config = new Configuration(Configuration.VERSION_2_3_32)
 
   var devMode: Boolean = false
 

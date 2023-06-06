@@ -18,6 +18,7 @@
 package org.beangle.template.freemarker
 
 import freemarker.template.Configuration
+import org.beangle.commons.lang.reflect.BeanInfos
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -25,7 +26,8 @@ class DefaultTemplateEngineTest extends AnyFunSpec with Matchers {
   describe(" DefaultTemplateEngine") {
     it("render") {
       val template = DefaultTemplateEngine().forTemplate("/templates/test.ftl")
-      val datas = Map("name" -> "world!")
+      val datas = Map("name" -> "world!", "scheme" -> new Scheme)
+      val a = BeanInfos.of(classOf[Scheme])
       println(template.render(datas))
     }
 

@@ -19,40 +19,44 @@ package org.beangle.template.freemarker
 
 import freemarker.core.CollectionAndSequence
 import freemarker.ext.beans.{BeanModel, BeansWrapper}
-import freemarker.template.{SimpleSequence, TemplateCollectionModel, TemplateModel, TemplateScalarModel}
+import freemarker.ext.util.WrapperTemplateModel
+import freemarker.template.*
+import org.beangle.commons.lang.Strings
 import org.beangle.commons.lang.reflect.BeanInfos
 
-class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`object`, wrapper) with TemplateScalarModel {
+class BeanModel(obj: AnyRef, wrapper: BeansWrapper) extends TemplateHashModelEx,
+  AdapterTemplateModel, WrapperTemplateModel, TemplateModelWithAPISupport, TemplateScalarModel {
 
   override def get(key: String): TemplateModel = {
     if (key == "class") {
-      wrapper.wrap(`object`.getClass)
+      wrapper.wrap(obj.getClass)
     } else {
-      if BeanInfos.cached(`object`.getClass) then
-        val bi = BeanInfos.get(`object`.getClass)
-        bi.getGetter(key) match {
-          case Some(s) => wrapper.wrap(s.invoke(`object`))
-          case None => bi.methods.get(key).headOption match {
-            case Some(h) => new SimpleMethodModel(`object`, h, wrapper)
-            case None => wrapper.wrap(null)
-          }
+      val bi = BeanInfos.get(obj.getClass)
+      bi.getGetter(key) match {
+        case Some(s) => wrapper.wrap(s.invoke(obj))
+        case None => bi.methods.get(key) match {
+          case Some(h) =>
+            //if method is single and without params,then invoke it directly.
+            if h.size == 1 && h.head.getParameterCount == 0 then wrapper.wrap(h.head.invoke(obj))
+            else new SimpleMethodModel(obj, h, wrapper)
+          case None => wrapper.wrap(null)
         }
-      else super.get(key)
+      }
     }
   }
 
   override def size(): Int = {
-    BeanInfos.get(`object`.getClass).properties.size
+    BeanInfos.get(obj.getClass).properties.size
   }
 
   override def keys(): TemplateCollectionModel = {
     import scala.jdk.javaapi.CollectionConverters.asJava
-    val properties = BeanInfos.get(`object`.getClass).properties
+    val properties = BeanInfos.get(obj.getClass).properties
     new CollectionAndSequence(new SimpleSequence(asJava(properties.keySet), wrapper))
   }
 
   override def values(): TemplateCollectionModel = {
-    val properties = BeanInfos.get(`object`.getClass).properties
+    val properties = BeanInfos.get(obj.getClass).properties
     val values = new java.util.ArrayList[Any](properties.size)
     val it = keys().iterator()
     while (it.hasNext) {
@@ -63,7 +67,7 @@ class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`ob
   }
 
   override def isEmpty: Boolean = {
-    `object` match {
+    obj match {
       case null => true
       case s: String => s.length() == 0
       case s: java.lang.Boolean => s == java.lang.Boolean.FALSE
@@ -72,6 +76,12 @@ class StringModel(`object`: AnyRef, wrapper: BeansWrapper) extends BeanModel(`ob
   }
 
   override def getAsString: String = {
-    `object`.toString
+    obj.toString
   }
+
+  override def getAPI: TemplateModel = wrapper.wrapAsAPI(obj)
+
+  override def getWrappedObject: AnyRef = obj
+
+  override def getAdaptedObject(hint: Class[_]): AnyRef = obj
 }

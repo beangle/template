@@ -17,18 +17,21 @@
 
 package org.beangle.template.freemarker
 
-import java.beans.PropertyDescriptor
-import java.lang.reflect.{Method, Modifier}
-import java.time._
-import java.time.temporal.Temporal
-import java.{util => ju}
-
 import freemarker.core.CollectionAndSequence
 import freemarker.ext.beans.BeansWrapper.{MethodAppearanceDecision, MethodAppearanceDecisionInput}
 import freemarker.ext.beans.{BeansWrapper, BeansWrapperConfiguration, MapModel, MethodAppearanceFineTuner}
-import freemarker.template._
+import freemarker.template.*
+import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.Strings.{substringAfter, uncapitalize}
+import org.beangle.template.freemarker.BeangleObjectWrapper.hibernateProxyClass
+import org.hibernate.Hibernate
+import org.hibernate.proxy.HibernateProxy
 
+import java.beans.PropertyDescriptor
+import java.lang.reflect.{Method, Modifier}
+import java.time.*
+import java.time.temporal.Temporal
+import java.util as ju
 import scala.jdk.javaapi.CollectionConverters.asJava
 
 object BeangleObjectWrapper {
@@ -37,6 +40,8 @@ object BeangleObjectWrapper {
     config.setMethodAppearanceFineTuner(new ScalaMethodAppearanceFineTuner)
     config
   }
+
+  var hibernateProxyClass: Class[_] = ClassLoaders.get("org.hibernate.proxy.HibernateProxy").orNull
 }
 
 class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wrapperConfig(), false) {
@@ -90,7 +95,9 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       // misc
       case tma: TemplateModelAdapter => tma.getTemplateModel
       case node: org.w3c.dom.Node => wrapDomNode(node)
-      case _ => new StringModel(obj, this)
+      case _ =>
+        if null != hibernateProxyClass && hibernateProxyClass.isAssignableFrom(obj.getClass) then new BeanModel(Hibernate.unproxy(obj), this)
+        else new BeanModel(obj, this)
     }
   }
 }
@@ -124,12 +131,13 @@ class ScalaMethodAppearanceFineTuner extends MethodAppearanceFineTuner {
   def process(in: MethodAppearanceDecisionInput, decision: MethodAppearanceDecision): Unit = {
     val method = in.getMethod
     val name = method.getName
-    if (name.equals("hashCode") || name.equals("toString")) return
-    propertyName(method) foreach { propertyName =>
-      val pd = new PropertyDescriptor(propertyName, method, null)
-      decision.setExposeAsProperty(pd)
-      decision.setExposeMethodAs(name)
-      decision.setMethodShadowsProperty(false)
+    if (!(name.equals("hashCode") || name.equals("toString"))) {
+      propertyName(method) foreach { propertyName =>
+        val pd = new PropertyDescriptor(propertyName, method, null)
+        decision.setExposeAsProperty(pd)
+        decision.setExposeMethodAs(name)
+        decision.setMethodShadowsProperty(false)
+      }
     }
   }
 

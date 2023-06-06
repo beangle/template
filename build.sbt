@@ -13,24 +13,25 @@ ThisBuild / scmInfo := Some(
 
 ThisBuild / developers := List(
   Developer(
-    id    = "chaostone",
-    name  = "Tihua Duan",
+    id = "chaostone",
+    name = "Tihua Duan",
     email = "duantihua@gmail.com",
-    url   = url("http://github.com/duantihua")
+    url = url("http://github.com/duantihua")
   )
 )
 
 ThisBuild / description := "The Beangle Template Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
-val beangle_commons_ver="5.5.3"
+val beangle_commons_ver = "5.5.3"
 val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % beangle_commons_ver
 val beangle_commons_text = "org.beangle.commons" %% "beangle-commons-text" % beangle_commons_ver
-val commonDeps = Seq(logback_classic, logback_core, scalatest, beangle_commons_core,beangle_commons_text)
+val hibernate = hibernate_core % "optional"
+val commonDeps = Seq(logback_classic, logback_core, scalatest, beangle_commons_core, beangle_commons_text)
 
 lazy val root = (project in file("."))
   .settings()
-  .aggregate(api,pfreemarker)
+  .aggregate(api, pfreemarker)
 
 
 lazy val api = (project in file("api"))
@@ -44,7 +45,7 @@ lazy val pfreemarker = (project in file("freemarker"))
   .settings(
     name := "beangle-template-freemarker",
     common,
-    libraryDependencies ++= (commonDeps ++ Seq(freemarker))
+    libraryDependencies ++= (commonDeps ++ Seq(freemarker, hibernate))
   ).dependsOn(api)
 
 publish / skip := true
