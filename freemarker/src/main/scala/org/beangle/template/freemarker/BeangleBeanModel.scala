@@ -24,7 +24,7 @@ import freemarker.template.*
 import org.beangle.commons.lang.Strings
 import org.beangle.commons.lang.reflect.BeanInfos
 
-class BeanModel(obj: AnyRef, wrapper: BeansWrapper) extends TemplateHashModelEx,
+class BeangleBeanModel(obj: AnyRef, wrapper: BeansWrapper) extends TemplateHashModelEx,
   AdapterTemplateModel, WrapperTemplateModel, TemplateModelWithAPISupport, TemplateScalarModel {
 
   private val beaninfo = BeanInfos.get(obj.getClass)

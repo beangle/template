@@ -18,8 +18,8 @@
 package org.beangle.template.freemarker
 
 import freemarker.core.CollectionAndSequence
+import freemarker.ext.beans.*
 import freemarker.ext.beans.BeansWrapper.{MethodAppearanceDecision, MethodAppearanceDecisionInput}
-import freemarker.ext.beans.{BeansWrapper, BeansWrapperConfiguration, MapModel, MethodAppearanceFineTuner}
 import freemarker.template.*
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.Strings.{substringAfter, uncapitalize}
@@ -96,8 +96,12 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       case tma: TemplateModelAdapter => tma.getTemplateModel
       case node: org.w3c.dom.Node => wrapDomNode(node)
       case _ =>
-        if null != hibernateProxyClass && hibernateProxyClass.isAssignableFrom(obj.getClass) then new BeanModel(Hibernate.unproxy(obj), this)
-        else new BeanModel(obj, this)
+        if null != hibernateProxyClass && hibernateProxyClass.isAssignableFrom(obj.getClass) then new BeangleBeanModel(Hibernate.unproxy(obj), this)
+        else
+          val className = obj.getClass.getName
+          if className.startsWith("java.") || className.startsWith("scala.") || className.contains("$$") then
+            new StringModel(obj, this)
+          else new BeangleBeanModel(obj, this)
     }
   }
 }
