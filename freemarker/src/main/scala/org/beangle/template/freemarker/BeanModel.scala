@@ -27,36 +27,33 @@ import org.beangle.commons.lang.reflect.BeanInfos
 class BeanModel(obj: AnyRef, wrapper: BeansWrapper) extends TemplateHashModelEx,
   AdapterTemplateModel, WrapperTemplateModel, TemplateModelWithAPISupport, TemplateScalarModel {
 
+  private val beaninfo = BeanInfos.get(obj.getClass)
+
   override def get(key: String): TemplateModel = {
-    if (key == "class") {
-      wrapper.wrap(obj.getClass)
-    } else {
-      val bi = BeanInfos.get(obj.getClass)
-      bi.getGetter(key) match {
-        case Some(s) => wrapper.wrap(s.invoke(obj))
-        case None => bi.methods.get(key) match {
-          case Some(h) =>
-            //if method is single and without params,then invoke it directly.
-            if h.size == 1 && h.head.getParameterCount == 0 then wrapper.wrap(h.head.invoke(obj))
-            else new SimpleMethodModel(obj, h, wrapper)
-          case None => wrapper.wrap(null)
-        }
+    beaninfo.getGetter(key) match {
+      case Some(s) => wrapper.wrap(s.invoke(obj))
+      case None => beaninfo.methods.get(key) match {
+        case Some(h) =>
+          //if method is single and without params,then invoke it directly.
+          if h.size == 1 && h.head.getParameterCount == 0 then wrapper.wrap(h.head.invoke(obj))
+          else new SimpleMethodModel(obj, h, wrapper)
+        case None => wrapper.wrap(null)
       }
     }
   }
 
   override def size(): Int = {
-    BeanInfos.get(obj.getClass).properties.size
+    beaninfo.properties.size
   }
 
   override def keys(): TemplateCollectionModel = {
     import scala.jdk.javaapi.CollectionConverters.asJava
-    val properties = BeanInfos.get(obj.getClass).properties
+    val properties = beaninfo.properties
     new CollectionAndSequence(new SimpleSequence(asJava(properties.keySet), wrapper))
   }
 
   override def values(): TemplateCollectionModel = {
-    val properties = BeanInfos.get(obj.getClass).properties
+    val properties = beaninfo.properties
     val values = new java.util.ArrayList[Any](properties.size)
     val it = keys().iterator()
     while (it.hasNext) {
@@ -69,7 +66,7 @@ class BeanModel(obj: AnyRef, wrapper: BeansWrapper) extends TemplateHashModelEx,
   override def isEmpty: Boolean = {
     obj match {
       case null => true
-      case s: String => s.length() == 0
+      case s: String => s.isEmpty
       case s: java.lang.Boolean => s == java.lang.Boolean.FALSE
       case _ => false
     }
