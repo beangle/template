@@ -57,9 +57,9 @@ class UIBean(context: ComponentContext) extends Component(context) {
     } else {
       if (text.endsWith(".id")) {
         val key = Strings.substringBeforeLast(text, ".id")
-        context.textProvider(key, defaultText)
+        context.textResource(key, defaultText)
       } else {
-        context.textProvider(text, defaultText)
+        context.textResource(text, defaultText)
       }
     }
   }

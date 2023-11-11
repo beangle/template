@@ -17,9 +17,9 @@
 
 package org.beangle.template.api
 
-import org.beangle.commons.text.i18n.TextProvider
+import org.beangle.commons.text.i18n.TextResource
 
-class ComponentContext(val engine: TagTemplateEngine, val idGenerator: UIIdGenerator, val textProvider: TextProvider, val services: Map[String, AnyRef]) {
+class ComponentContext(val engine: TagTemplateEngine, val idGenerator: UIIdGenerator, val textResource: TextResource, val services: Map[String, AnyRef]) {
 
   private val themeStack = new ThemeStack()
 

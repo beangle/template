@@ -25,7 +25,6 @@ import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.Strings.{substringAfter, uncapitalize}
 import org.beangle.template.freemarker.BeangleObjectWrapper.hibernateProxyClass
 import org.hibernate.Hibernate
-import org.hibernate.proxy.HibernateProxy
 
 import java.beans.PropertyDescriptor
 import java.lang.reflect.{Method, Modifier}
@@ -96,7 +95,8 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       case tma: TemplateModelAdapter => tma.getTemplateModel
       case node: org.w3c.dom.Node => wrapDomNode(node)
       case _ =>
-        if null != hibernateProxyClass && hibernateProxyClass.isAssignableFrom(obj.getClass) then new BeangleBeanModel(Hibernate.unproxy(obj), this)
+        if null != hibernateProxyClass && hibernateProxyClass.isAssignableFrom(obj.getClass) then
+          new BeangleBeanModel(Hibernate.unproxy(obj), this)
         else
           val className = obj.getClass.getName
           if className.startsWith("java.") || className.startsWith("scala.") || className.contains("$$") then
