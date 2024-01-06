@@ -22,7 +22,7 @@ import org.beangle.commons.lang.Strings
 import org.beangle.commons.net.http.HttpUtils
 
 import java.io.{IOException, InputStreamReader, Reader}
-import java.net.URL
+import java.net.URI
 
 class HttpTemplateLoader(val pattern: String, preload: Boolean) extends TemplateLoader {
   private var files: Set[String] = Set.empty
@@ -42,9 +42,9 @@ class HttpTemplateLoader(val pattern: String, preload: Boolean) extends Template
   @throws[IOException]
   override def findTemplateSource(name: String): Any = {
     if (preload) {
-      if (files.contains(name)) new URLTemplateSource(new URL(getURL(name))) else null
+      if (files.contains(name)) new URLTemplateSource(URI.create(getURL(name)).toURL) else null
     } else {
-      val url = new URL(getURL(name))
+      val url = URI.create(getURL(name)).toURL
       val status = HttpUtils.access(url)
       if (status.isOk) new URLTemplateSource(url) else null
     }
