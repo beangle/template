@@ -18,14 +18,14 @@
 package org.beangle.template.freemarker
 
 import freemarker.cache.{FileTemplateLoader, MultiTemplateLoader, TemplateLoader}
-import freemarker.template.{Configuration, ObjectWrapper, TemplateExceptionHandler}
+import freemarker.template.{Configuration, ObjectWrapper, SimpleHash}
 import org.beangle.commons.bean.Initializing
 import org.beangle.commons.io.IOs
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.Strings.{split, substringAfter}
 import org.beangle.commons.lang.annotation.description
 
-import java.io.{File, IOException}
+import java.io.{File, IOException, StringWriter}
 
 object Configurer {
 
@@ -88,8 +88,7 @@ class Configurer extends Initializing {
     templatePath
   }
 
-  /**
-   * The default template loader is a MultiTemplateLoader which includes
+  /** The default template loader is a MultiTemplateLoader which includes
    * BeangleClassTemplateLoader(classpath:) and a WebappTemplateLoader
    * (webapp:) and FileTemplateLoader(file:) . All template path described
    * in init parameter templatePath or TemplatePlath
@@ -168,4 +167,12 @@ class Configurer extends Initializing {
     properties.toMap
   }
 
+  def render(url: String, datas: collection.Map[String, Any]): String = {
+    val model = new SimpleHash(this.config.getObjectWrapper)
+    datas foreach { case (k, v) => model.put(k, v) }
+    val buf = new StringWriter(512)
+    val template = this.config.getTemplate(url)
+    template.process(model, buf)
+    buf.toString
+  }
 }

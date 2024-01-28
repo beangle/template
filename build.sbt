@@ -2,7 +2,7 @@ import org.beangle.parent.Dependencies._
 import org.beangle.parent.Settings._
 
 ThisBuild / organization := "org.beangle.template"
-ThisBuild / version := "0.1.10-SNAPSHOT"
+ThisBuild / version := "0.1.10"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -23,7 +23,7 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Template Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
-val beangle_commons_ver = "5.6.8"
+val beangle_commons_ver = "5.6.10"
 val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % beangle_commons_ver
 val beangle_commons_text = "org.beangle.commons" %% "beangle-commons-text" % beangle_commons_ver
 val hibernate = hibernate_core % "optional"

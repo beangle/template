@@ -24,10 +24,10 @@ import java.io.Writer
 
 object DefaultTemplateEngine {
   def apply(): DefaultTemplateEngine = {
-    val configer = new Configurer()
-    configer.init()
-    configer.config.setCacheStorage(new StrongCacheStorage())
-    new DefaultTemplateEngine(configer.config)
+    val cfg = new Configurer()
+    cfg.init()
+    cfg.config.setCacheStorage(new StrongCacheStorage())
+    new DefaultTemplateEngine(cfg.config)
   }
 }
 

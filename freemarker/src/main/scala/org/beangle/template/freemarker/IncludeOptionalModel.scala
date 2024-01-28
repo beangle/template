@@ -20,6 +20,9 @@ package org.beangle.template.freemarker
 import freemarker.core.Environment
 import freemarker.template.{TemplateDirectiveBody, TemplateDirectiveModel, TemplateModel}
 
+/** 如果存在则包含
+ * @see {@code .get_optional_template(name, options)} and GetOptionalTemplateMethod
+ */
 class IncludeOptionalModel extends TemplateDirectiveModel {
 
   override def execute(env: Environment, map: java.util.Map[_, _], templateModel: Array[TemplateModel],
