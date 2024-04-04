@@ -1,8 +1,8 @@
-import org.beangle.parent.Dependencies._
-import org.beangle.parent.Settings._
+import org.beangle.parent.Dependencies.*
+import org.beangle.parent.Settings.*
 
 ThisBuild / organization := "org.beangle.template"
-ThisBuild / version := "0.1.12-SNAPSHOT"
+ThisBuild / version := "0.1.12"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -23,30 +23,15 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Template Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
-val beangle_commons_ver = "5.6.11"
-val beangle_commons_core = "org.beangle.commons" %% "beangle-commons-core" % beangle_commons_ver
-val beangle_commons_text = "org.beangle.commons" %% "beangle-commons-text" % beangle_commons_ver
-val hibernate = hibernate_core % "optional"
-val commonDeps = Seq(logback_classic, logback_core, scalatest, beangle_commons_core, beangle_commons_text)
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "5.6.15"
 
-lazy val root = (project in file("."))
-  .settings()
-  .aggregate(api, pfreemarker)
-
-
-lazy val api = (project in file("api"))
+lazy val api = (project in file("."))
   .settings(
-    name := "beangle-template-api",
+    name := "beangle-template",
     common,
-    libraryDependencies ++= (commonDeps)
+    libraryDependencies ++= Seq(beangle_commons, freemarker % "optional"),
+    libraryDependencies ++= Seq(scalatest, logback_classic % "test"),
+    libraryDependencies ++= Seq(hibernate_core % "optional")
   )
 
-lazy val pfreemarker = (project in file("freemarker"))
-  .settings(
-    name := "beangle-template-freemarker",
-    common,
-    libraryDependencies ++= (commonDeps ++ Seq(freemarker, hibernate))
-  ).dependsOn(api)
-
-publish / skip := true
 ThisBuild / Test / parallelExecution := false
