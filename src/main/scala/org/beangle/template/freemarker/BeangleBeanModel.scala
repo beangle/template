@@ -18,10 +18,9 @@
 package org.beangle.template.freemarker
 
 import freemarker.core.CollectionAndSequence
-import freemarker.ext.beans.{BeanModel, BeansWrapper}
+import freemarker.ext.beans.BeansWrapper
 import freemarker.ext.util.WrapperTemplateModel
 import freemarker.template.*
-import org.beangle.commons.lang.Strings
 import org.beangle.commons.lang.reflect.BeanInfos
 
 class BeangleBeanModel(obj: AnyRef, wrapper: BeansWrapper) extends TemplateHashModelEx,
@@ -37,7 +36,8 @@ class BeangleBeanModel(obj: AnyRef, wrapper: BeansWrapper) extends TemplateHashM
           //if method is single and without params,then invoke it directly.
           if h.size == 1 && h.head.getParameterCount == 0 then wrapper.wrap(h.head.invoke(obj))
           else new SimpleMethodModel(obj, h, wrapper)
-        case None => wrapper.wrap(null)
+        case None =>
+          if (key == "className") wrapper.wrap(obj.getClass.getName) else wrapper.wrap(null)
       }
     }
   }
