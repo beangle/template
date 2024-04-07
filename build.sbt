@@ -30,8 +30,7 @@ lazy val api = (project in file("."))
     name := "beangle-template",
     common,
     libraryDependencies ++= Seq(beangle_commons, freemarker % "optional"),
-    libraryDependencies ++= Seq(scalatest, logback_classic % "test"),
-    libraryDependencies ++= Seq(hibernate_core % "optional")
+    libraryDependencies ++= Seq(scalatest, logback_classic % "test")
   )
 
 ThisBuild / Test / parallelExecution := false

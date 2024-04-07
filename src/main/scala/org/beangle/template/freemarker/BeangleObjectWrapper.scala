@@ -21,10 +21,9 @@ import freemarker.core.CollectionAndSequence
 import freemarker.ext.beans.*
 import freemarker.ext.beans.BeansWrapper.{MethodAppearanceDecision, MethodAppearanceDecisionInput}
 import freemarker.template.*
+import org.beangle.commons.bean.ProxyResolver
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.Strings.{substringAfter, uncapitalize}
-import org.beangle.template.freemarker.BeangleObjectWrapper.hibernateProxyClass
-import org.hibernate.Hibernate
 
 import java.beans.PropertyDescriptor
 import java.lang.reflect.{Method, Modifier}
@@ -39,11 +38,11 @@ object BeangleObjectWrapper {
     config.setMethodAppearanceFineTuner(new ScalaMethodAppearanceFineTuner)
     config
   }
-
-  var hibernateProxyClass: Class[_] = ClassLoaders.get("org.hibernate.proxy.HibernateProxy").orNull
 }
 
 class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wrapperConfig(), false) {
+
+  var proxyResolver: ProxyResolver = ProxyResolver.Null
 
   override def unwrap(model: TemplateModel, hint: Class[_]): AnyRef = {
     model match {
@@ -95,8 +94,8 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       case tma: TemplateModelAdapter => tma.getTemplateModel
       case node: org.w3c.dom.Node => wrapDomNode(node)
       case _ =>
-        if null != hibernateProxyClass && hibernateProxyClass.isAssignableFrom(obj.getClass) then
-          new BeangleBeanModel(Hibernate.unproxy(obj), this)
+        if proxyResolver.isProxy(obj) then
+          new BeangleBeanModel(proxyResolver.unproxy(obj), this)
         else
           val className = obj.getClass.getName
           if className.startsWith("java.") || className.startsWith("scala.") || className.contains("$$") then
