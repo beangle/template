@@ -65,7 +65,7 @@ class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTempl
    */
   override def init(): Unit = {
     config.setEncoding(config.getLocale, "UTF-8")
-    ClassLoaders.getResource("org/beangle/webmvc/freemarker/tag.properties") foreach { r =>
+    ClassLoaders.getResource("org/beangle/template/freemarker/tag.properties") foreach { r =>
       IOs.readJavaProperties(r) foreach {
         case (k, v) => config.setSetting(k, v)
       }
