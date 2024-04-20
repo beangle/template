@@ -17,7 +17,6 @@
 
 package org.beangle.template.freemarker
 
-import freemarker.ext.util.WrapperTemplateModel
 import freemarker.template.*
 import org.beangle.commons.bean.Properties
 
@@ -26,7 +25,7 @@ class SeqModel(val seq: collection.Seq[_], objectWrapper: ObjectWrapper) extends
 
   override def getAdaptedObject(hint: Class[_]): Any = seq
 
-  override def get(key: String): TemplateModel = objectWrapper.wrap(Properties.get(seq, key))
+  override def get(key: String): TemplateModel = objectWrapper.wrap(Properties.get[Any](seq, key))
 
   override def isEmpty: Boolean = seq.isEmpty
 

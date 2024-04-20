@@ -19,6 +19,7 @@ package org.beangle.template.freemarker
 
 import freemarker.cache.TemplateLoader
 import org.beangle.commons.lang.Strings
+import org.beangle.commons.net.Networks
 import org.beangle.commons.net.http.HttpUtils
 
 import java.io.{IOException, InputStreamReader, Reader}
@@ -42,9 +43,9 @@ class HttpTemplateLoader(val pattern: String, preload: Boolean) extends Template
   @throws[IOException]
   override def findTemplateSource(name: String): Any = {
     if (preload) {
-      if (files.contains(name)) new URLTemplateSource(URI.create(getURL(name)).toURL) else null
+      if (files.contains(name)) new URLTemplateSource(Networks.url(getURL(name))) else null
     } else {
-      val url = URI.create(getURL(name)).toURL
+      val url = Networks.url(getURL(name))
       val status = HttpUtils.access(url)
       if (status.isOk) new URLTemplateSource(url) else null
     }
