@@ -17,12 +17,10 @@
 
 package org.beangle.template.freemarker
 
-import freemarker.cache.{MultiTemplateLoader, TemplateLoader, URLTemplateLoader}
-import org.beangle.commons.lang.{ClassLoaders, Strings}
-import org.beangle.template.freemarker.ProfileTemplateLoader.process
+import freemarker.cache.TemplateLoader
+import org.beangle.commons.lang.Strings
 
 import java.io.Reader
-import java.net.URL
 
 object ProfileTemplateLoader {
 
@@ -50,6 +48,10 @@ object ProfileTemplateLoader {
 
   def removeProfile(): Unit = {
     profile.remove()
+  }
+
+  def getProfile: Option[String] = {
+    Option(profile.get())
   }
 }
 
