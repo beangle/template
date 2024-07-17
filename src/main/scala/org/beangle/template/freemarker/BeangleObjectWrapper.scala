@@ -99,7 +99,7 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
         else
           val className = obj.getClass.getName
           if className.startsWith("java.") || className.startsWith("scala.") || className.contains("$$") then
-            new StringModel(obj, this)
+            new GenericObjectModel(obj, this)
           else new BeangleBeanModel(obj, this)
     }
   }
