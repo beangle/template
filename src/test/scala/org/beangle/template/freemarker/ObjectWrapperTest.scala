@@ -18,8 +18,8 @@
 package org.beangle.template.freemarker
 
 import org.beangle.commons.collection.page.SinglePage
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.funspec.AnyFunSpec
+import org.scalatest.matchers.should.Matchers
 
 class ObjectWrapperTest extends AnyFunSpec with Matchers {
   describe("BeangleObjectWrapper") {
@@ -29,6 +29,11 @@ class ObjectWrapperTest extends AnyFunSpec with Matchers {
       val wrapped = wrapper.wrap(page)
       val unwrapped = wrapper.unwrap(wrapped)
       assert(unwrapped == page)
+    }
+    it("wrapper primary array") {
+      val wrapper = new BeangleObjectWrapper()
+      val ints = Array(1, 2, 3)
+      wrapper.wrap(ints)
     }
   }
 }

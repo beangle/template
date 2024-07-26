@@ -22,7 +22,6 @@ import freemarker.ext.beans.*
 import freemarker.ext.beans.BeansWrapper.{MethodAppearanceDecision, MethodAppearanceDecisionInput}
 import freemarker.template.*
 import org.beangle.commons.bean.ProxyResolver
-import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.Strings.{substringAfter, uncapitalize}
 
 import java.beans.PropertyDescriptor
@@ -86,7 +85,6 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       case iter: Iterable[_] => new SimpleSequence(asJava(iter.toSeq), this)
 
       // java collections
-      case array: Array[_] => new SimpleSequence(ju.Arrays.asList(array: _*), this)
       case collection: ju.Collection[_] => new SimpleSequence(collection, this)
       case map: ju.Map[_, _] => new FriendlyMapModel(map, this)
       case iter: ju.Iterator[_] => new SimpleCollection(iter, this)
@@ -94,13 +92,22 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       case tma: TemplateModelAdapter => tma.getTemplateModel
       case node: org.w3c.dom.Node => wrapDomNode(node)
       case _ =>
-        if proxyResolver.isProxy(obj) then
-          new BeangleBeanModel(proxyResolver.unproxy(obj), this)
-        else
-          val className = obj.getClass.getName
-          if className.startsWith("java.") || className.startsWith("scala.") || className.contains("$$") then
-            new GenericObjectModel(obj, this)
-          else new BeangleBeanModel(obj, this)
+        if (obj.getClass.isArray) {
+          val size = java.lang.reflect.Array.getLength(obj)
+          val list = new ju.ArrayList[Any](size)
+          for (i <- 0 until size) {
+            list.add(java.lang.reflect.Array.get(obj, i))
+          }
+          new SimpleSequence(list, this)
+        } else {
+          if proxyResolver.isProxy(obj) then
+            new BeangleBeanModel(proxyResolver.unproxy(obj), this)
+          else
+            val className = obj.getClass.getName
+            if className.startsWith("java.") || className.startsWith("scala.") || className.contains("$$") then
+              new GenericObjectModel(obj, this)
+            else new BeangleBeanModel(obj, this)
+        }
     }
   }
 }
