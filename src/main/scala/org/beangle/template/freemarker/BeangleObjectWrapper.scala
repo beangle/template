@@ -93,12 +93,16 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
       case node: org.w3c.dom.Node => wrapDomNode(node)
       case _ =>
         if (obj.getClass.isArray) {
-          val size = java.lang.reflect.Array.getLength(obj)
-          val list = new ju.ArrayList[Any](size)
-          for (i <- 0 until size) {
-            list.add(java.lang.reflect.Array.get(obj, i))
+          if (obj.getClass.getComponentType.isPrimitive) {
+            val size = java.lang.reflect.Array.getLength(obj)
+            val list = new ju.ArrayList[Any](size)
+            for (i <- 0 until size) {
+              list.add(java.lang.reflect.Array.get(obj, i))
+            }
+            new SimpleSequence(list, this)
+          } else {
+            new SimpleSequence(ju.Arrays.asList(obj.asInstanceOf[Array[_]]: _*), this)
           }
-          new SimpleSequence(list, this)
         } else {
           if proxyResolver.isProxy(obj) then
             new BeangleBeanModel(proxyResolver.unproxy(obj), this)

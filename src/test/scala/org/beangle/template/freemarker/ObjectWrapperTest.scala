@@ -30,10 +30,12 @@ class ObjectWrapperTest extends AnyFunSpec with Matchers {
       val unwrapped = wrapper.unwrap(wrapped)
       assert(unwrapped == page)
     }
-    it("wrapper primary array") {
+    it("wrapper array") {
       val wrapper = new BeangleObjectWrapper()
       val ints = Array(1, 2, 3)
       wrapper.wrap(ints)
+      val strs = Array("1", "2", "3")
+      wrapper.wrap(strs)
     }
   }
 }
