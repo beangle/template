@@ -19,12 +19,13 @@ package org.beangle.template.freemarker
 
 import freemarker.cache.URLTemplateLoader
 import org.beangle.commons.lang.ClassLoaders
+import org.beangle.template.api.DynaProfile
 
 import java.net.URL
 
 class ClassTemplateLoader(prefixStr: String = null) extends URLTemplateLoader {
 
-  private val prefix = ProfileTemplateLoader.process(prefixStr)
+  private val prefix = DynaProfile.process(prefixStr)
 
   protected def getURL(name: String): URL = {
     var url: Option[URL] = None

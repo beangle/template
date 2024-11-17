@@ -24,7 +24,7 @@ import java.io.Writer
 
 object DefaultTemplateEngine {
   def apply(): DefaultTemplateEngine = {
-    val cfg = new Configurer()
+    val cfg = new Configurator()
     cfg.init()
     cfg.config.setCacheStorage(new StrongCacheStorage())
     new DefaultTemplateEngine(cfg.config)

@@ -21,8 +21,8 @@ import freemarker.core.CollectionAndSequence
 import freemarker.ext.beans.*
 import freemarker.ext.beans.BeansWrapper.{MethodAppearanceDecision, MethodAppearanceDecisionInput}
 import freemarker.template.*
-import org.beangle.commons.bean.ProxyResolver
 import org.beangle.commons.lang.Strings.{substringAfter, uncapitalize}
+import org.beangle.commons.lang.reflect.BeanInfos
 
 import java.beans.PropertyDescriptor
 import java.lang.reflect.{Method, Modifier}
@@ -40,8 +40,6 @@ object BeangleObjectWrapper {
 }
 
 class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wrapperConfig(), false) {
-
-  var proxyResolver: ProxyResolver = ProxyResolver.Null
 
   override def unwrap(model: TemplateModel, hint: Class[_]): AnyRef = {
     model match {
@@ -104,13 +102,8 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
             new SimpleSequence(ju.Arrays.asList(obj.asInstanceOf[Array[_]]: _*), this)
           }
         } else {
-          if proxyResolver.isProxy(obj) then
-            new BeangleBeanModel(proxyResolver.unproxy(obj), this)
-          else
-            val className = obj.getClass.getName
-            if className.startsWith("java.") || className.startsWith("scala.") || className.contains("$$") then
-              new GenericObjectModel(obj, this)
-            else new BeangleBeanModel(obj, this)
+          val clazz = obj.getClass
+          if BeanInfos.cache.contains(clazz) then new BeangleBeanModel(obj, this) else GenericObjectModel(obj, this)
         }
     }
   }

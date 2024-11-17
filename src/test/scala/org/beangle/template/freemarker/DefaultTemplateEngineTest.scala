@@ -17,8 +17,8 @@
 
 package org.beangle.template.freemarker
 
-import freemarker.template.Configuration
 import org.beangle.commons.lang.reflect.BeanInfos
+import org.beangle.template.api.DynaProfile
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
@@ -32,7 +32,7 @@ class DefaultTemplateEngineTest extends AnyFunSpec with Matchers {
     }
 
     it("profile loader") {
-      ProfileTemplateLoader.setProfile("dev")
+      DynaProfile.set("dev")
       val template = DefaultTemplateEngine().forTemplate("/templates/index.ftl")
       val datas = Map("name" -> "world!")
       val html = template.render(datas)

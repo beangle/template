@@ -19,50 +19,18 @@ package org.beangle.template.freemarker
 
 import freemarker.cache.TemplateLoader
 import org.beangle.commons.lang.Strings
+import org.beangle.template.api.DynaProfile
 
 import java.io.Reader
-
-object ProfileTemplateLoader {
-
-  private val profile = new ThreadLocal[String]
-
-  /** Not starts with /,but end with / */
-  def process(pre: String): String = {
-    if (Strings.isBlank(pre)) return ""
-    var prefix = pre.trim()
-
-    if prefix.equals("/") then ""
-    else
-      if (!prefix.endsWith("/")) prefix += "/"
-      if (prefix.startsWith("/")) prefix = prefix.substring(1)
-      prefix
-  }
-
-  def setProfile(p: Any): Unit = {
-    p match
-      case null => profile.remove()
-      case None => profile.remove()
-      case name: String => if name.isBlank then profile.remove() else profile.set(process(name))
-      case _ => profile.set(process(p.toString))
-  }
-
-  def removeProfile(): Unit = {
-    profile.remove()
-  }
-
-  def getProfile: Option[String] = {
-    Option(profile.get())
-  }
-}
 
 class ProfileTemplateLoader(loader: TemplateLoader) extends TemplateLoader {
 
   override def findTemplateSource(name: String): AnyRef = {
-    val p = ProfileTemplateLoader.profile.get()
-    if null == p then loader.findTemplateSource(name)
-    else
-      val profiled = loader.findTemplateSource(p + name)
-      if null == profiled then loader.findTemplateSource(name) else profiled
+    DynaProfile.get match
+      case None => loader.findTemplateSource(name)
+      case Some(p) =>
+        val profiled = loader.findTemplateSource(p + name)
+        if null == profiled then loader.findTemplateSource(name) else profiled
   }
 
   override def getLastModified(s: Any): Long = {

@@ -24,23 +24,24 @@ import org.beangle.commons.io.IOs
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.Strings.{split, substringAfter}
 import org.beangle.commons.lang.annotation.description
+import org.beangle.template.api.DynaProfile
 
 import java.io.{File, IOException, StringWriter}
 
-object Configurer {
+object Configurator {
 
   //must before configuration init
   //disable freemarker logging
   System.setProperty(freemarker.log.Logger.SYSTEM_PROPERTY_NAME_LOGGER_LIBRARY, freemarker.log.Logger.LIBRARY_NAME_NONE)
 
   def newConfig: Configuration = {
-    val cfg = new Configurer
+    val cfg = new Configurator
     cfg.init()
     cfg.config
   }
 
   def newConfig(templatePath: String): Configuration = {
-    val cfg = new Configurer
+    val cfg = new Configurator
     cfg.templatePath = templatePath
     cfg.init()
     cfg.config
@@ -48,7 +49,7 @@ object Configurer {
 }
 
 @description("Freemarker配置提供者")
-class Configurer extends Initializing {
+class Configurator extends Initializing {
 
   val config = new Configuration(Configuration.VERSION_2_3_33)
 
@@ -108,7 +109,7 @@ class Configurer extends Initializing {
   }
 
   def cleanProfile(): Unit = {
-    ProfileTemplateLoader.removeProfile()
+    DynaProfile.remove()
   }
 
   def buildLoader(path: String): TemplateLoader = {
