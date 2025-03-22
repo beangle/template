@@ -50,4 +50,16 @@ object DynaProfile {
   def get: Option[String] = {
     Option(profile.get())
   }
+
+  def path(prefix: String, p: String): String = {
+    if (prefix == null) {
+      p
+    } else {
+      if p.charAt(0) == '/' then prefix + p.substring(1) else prefix + p
+    }
+  }
+
+  def path(p: String): String = {
+    path(profile.get(), p)
+  }
 }
