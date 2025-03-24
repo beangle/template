@@ -51,7 +51,7 @@ object DynaProfile {
     Option(profile.get())
   }
 
-  def path(prefix: String, p: String): String = {
+  def concat(prefix: String, p: String): String = {
     if (prefix == null) {
       p
     } else {
@@ -60,6 +60,6 @@ object DynaProfile {
   }
 
   def path(p: String): String = {
-    path(profile.get(), p)
+    concat(profile.get(), p)
   }
 }

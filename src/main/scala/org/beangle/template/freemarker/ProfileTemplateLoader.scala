@@ -18,7 +18,6 @@
 package org.beangle.template.freemarker
 
 import freemarker.cache.TemplateLoader
-import org.beangle.commons.lang.Strings
 import org.beangle.template.api.DynaProfile
 
 import java.io.Reader
@@ -29,8 +28,13 @@ class ProfileTemplateLoader(loader: TemplateLoader) extends TemplateLoader {
     DynaProfile.get match
       case None => loader.findTemplateSource(name)
       case Some(p) =>
-        val profiled = loader.findTemplateSource(p + name)
-        if null == profiled then loader.findTemplateSource(name) else profiled
+        if (name.startsWith(p)) {
+          val profiled = loader.findTemplateSource(name)
+          if null == profiled then loader.findTemplateSource(name.substring(p.length)) else profiled
+        } else {
+          val profiled = loader.findTemplateSource(DynaProfile.concat(p, name))
+          if null == profiled then loader.findTemplateSource(name) else profiled
+        }
   }
 
   override def getLastModified(s: Any): Long = {
