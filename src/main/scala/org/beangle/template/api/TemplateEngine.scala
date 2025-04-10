@@ -30,6 +30,8 @@ trait TemplateEngine {
 
   def forTemplate(template: String): TemplateRender
 
+  def forString(templateStr:String):TemplateRender
+
   def suffix: String
 
 }

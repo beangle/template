@@ -15,28 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.beangle.template.freemarker
+package org.beangle.template.api
 
-import freemarker.cache.StrongCacheStorage
-import freemarker.template.{Configuration, Template}
-import org.beangle.template.api.TemplateRender
-
-import java.io.{StringReader, Writer}
-
-object DefaultTemplateEngine {
-  def apply(): DefaultTemplateEngine = {
-    val cfg = new Configurator()
-    cfg.init()
-    cfg.config.setCacheStorage(new StrongCacheStorage())
-    new DefaultTemplateEngine(cfg.config)
+/** 模板解析器
+ *
+ * @param engine
+ */
+class TemplateInterpreter(engine: TemplateEngine) {
+  def interpret(contents: String, model: Any): String = {
+    val render = engine.forString(contents)
+    render.render(model)
   }
-}
-
-class DefaultTemplateEngine(val config: Configuration) extends AbstractTemplateEngine {
-
-  @throws(classOf[Exception])
-  override def renderTo(template: String, model: Any, writer: Writer): Unit = {
-    forTemplate(template).renderTo(model, writer)
-  }
-
 }

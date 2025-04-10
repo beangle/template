@@ -24,7 +24,6 @@ import org.beangle.commons.io.IOs
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.annotation.description
 import org.beangle.template.api.*
-import org.beangle.template.freemarker.{AbstractTemplateEngine, IncludeOptionalModel, ClassTemplateLoader}
 
 import java.io.Writer
 import java.util as ju
@@ -40,7 +39,7 @@ import java.util as ju
  * @author chaostone
  */
 @description("Freemarker Tag 模板引擎")
-class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTemplateEngine with TagTemplateEngine with Initializing {
+class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTemplateEngine, TagTemplateEngine, Initializing {
 
   val config = new Configuration(Configuration.VERSION_2_3_32)
 

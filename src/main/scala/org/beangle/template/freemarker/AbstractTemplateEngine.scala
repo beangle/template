@@ -23,9 +23,9 @@ import org.beangle.commons.lang.Throwables
 import org.beangle.commons.logging.Logging
 import org.beangle.template.api.{TemplateEngine, TemplateRender}
 
-import java.io.IOException
+import java.io.{IOException, StringReader}
 
-abstract class AbstractTemplateEngine extends TemplateEngine with Logging {
+abstract class AbstractTemplateEngine extends TemplateEngine, Logging {
   /**
    * Load template
    */
@@ -40,9 +40,14 @@ abstract class AbstractTemplateEngine extends TemplateEngine with Logging {
     }
   }
 
-  def forTemplate(template: String): TemplateRender = {
+  override def forTemplate(template: String): TemplateRender = {
     val cfg = config
     new DefaultTemplateRender(cfg, getTemplate(cfg, template))
+  }
+
+  override def forString(templateStr: String): TemplateRender = {
+    val t = new Template("inline", new StringReader(templateStr), config)
+    new DefaultTemplateRender(config, t)
   }
 
   def config: Configuration
