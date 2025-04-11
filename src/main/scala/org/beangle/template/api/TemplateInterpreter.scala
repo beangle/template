@@ -22,7 +22,7 @@ package org.beangle.template.api
  * @param engine
  */
 class TemplateInterpreter(engine: TemplateEngine) {
-  def interpret(contents: String, model: Any): String = {
+  def process(contents: String, model: Any): String = {
     val render = engine.forString(contents)
     render.render(model)
   }
