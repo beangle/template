@@ -21,9 +21,6 @@ package org.beangle.template.api
  *
  * @param engine
  */
-class TemplateInterpreter(engine: TemplateEngine) {
-  def process(contents: String, model: Any): String = {
-    val render = engine.forString(contents)
-    render.render(model)
-  }
+trait TemplateInterpreter {
+  def process(contents: String, model: Any): String
 }
