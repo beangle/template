@@ -25,10 +25,10 @@ import java.util.Collections
 
 class SimpleMethodModelTest extends AnyFunSpec with Matchers {
   describe("SimpleMethodModel") {
-    it("exec scala normal   methods") {
+    it("exec scala normal methods") {
       val wrapper = new BeangleObjectWrapper
       val clz = classOf[Teacher]
-      val methods = clz.getMethods().filter(_.getName == "updateName").toIndexedSeq
+      val methods = clz.getMethods.filter(_.getName == "updateName").toIndexedSeq
       val model = new SimpleMethodModel(new Teacher(), methods, wrapper)
       model.exec(util.Arrays.asList(wrapper.wrap("jack")))
     }
@@ -36,16 +36,17 @@ class SimpleMethodModelTest extends AnyFunSpec with Matchers {
     it("exec java varargs methods") {
       val wrapper = new BeangleObjectWrapper
       val clz = classOf[Coach]
-      val methods = clz.getMethods().filter(_.getName == "addSkills").toIndexedSeq
+      val methods = clz.getMethods.filter(_.getName == "addSkills").toIndexedSeq
       val model = new SimpleMethodModel(new Coach(), methods, wrapper)
       model.exec(util.Arrays.asList(wrapper.wrap("pe")))
       model.exec(util.Arrays.asList(wrapper.wrap("pe"), wrapper.wrap("football")))
       model.exec(util.Arrays.asList(wrapper.wrap("pe"), wrapper.wrap("basketball"), wrapper.wrap("football")))
     }
+
     it("exec scala varargs methods") {
       val wrapper = new BeangleObjectWrapper
       val clz = classOf[Teacher]
-      val methods = clz.getMethods().filter(_.getName == "addSkills").toIndexedSeq
+      val methods = clz.getMethods.filter(_.getName == "addSkills").toIndexedSeq
       val model = new SimpleMethodModel(new Teacher(), methods, wrapper)
       model.exec(util.Arrays.asList(wrapper.wrap("art")))
       model.exec(util.Arrays.asList(wrapper.wrap("art"), wrapper.wrap("panting")))
@@ -55,7 +56,7 @@ class SimpleMethodModelTest extends AnyFunSpec with Matchers {
     it("exec scala simple varargs methods") {
       val wrapper = new BeangleObjectWrapper
       val clz = classOf[Teacher]
-      val methods = clz.getMethods().filter(_.getName == "addTitles").toIndexedSeq
+      val methods = clz.getMethods.filter(_.getName == "addTitles").toIndexedSeq
       val model = new SimpleMethodModel(new Teacher(), methods, wrapper)
       model.exec(Collections.emptyList())
       model.exec(util.Arrays.asList(wrapper.wrap("hero")))
