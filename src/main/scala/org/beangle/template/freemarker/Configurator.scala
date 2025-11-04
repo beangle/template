@@ -27,6 +27,7 @@ import org.beangle.commons.lang.annotation.description
 import org.beangle.template.api.DynaProfile
 
 import java.io.{File, IOException, StringWriter}
+import java.net.URL
 
 object Configurator {
 
@@ -136,20 +137,20 @@ class Configurator extends Initializing {
   }
 
   /**
-   * Load the multi settings from the /META-INF/freemarker.properties and
-   * /freemarker.properties file on the classpath
+   * Load the multi settings from the beangle.xml on the classpath
    *
    * @see freemarker.template.Configuration#setSettings for the definition of valid settings
    */
   def properties: Map[String, String] = {
-    val properties = new collection.mutable.HashMap[String, String]
-    // 1. first META-INF/freemarker.properties
-    for (url <- ClassLoaders.getResources("META-INF/freemarker.properties"))
-      properties ++= IOs.readJavaProperties(url)
+    val props = new collection.mutable.HashMap[String, String]
 
-    // 2. second global freemarker.properties
-    for (url <- ClassLoaders.getResources("freemarker.properties"))
-      properties ++= IOs.readJavaProperties(url)
+    val overrides = new collection.mutable.HashMap[String, String]
+    // 1. read beangle.xml
+    for (url <- ClassLoaders.getResources("beangle.xml")) {
+      val rs = fromXml(url)
+      if (rs._1) props.addAll(rs._2) else overrides.addAll(rs._2)
+    }
+    props.addAll(overrides)
 
     // 3. system properties
     val sysProps = System.getProperties
@@ -157,15 +158,15 @@ class Configurator extends Initializing {
     while (sysKeys.hasMoreElements) {
       val key = sysKeys.nextElement.asInstanceOf[String]
       val value: String = sysProps.getProperty(key)
-      if (key.startsWith("freemarker.")) properties.put(substringAfter(key, "freemarker."), value)
+      if (key.startsWith("freemarker.")) props.put(substringAfter(key, "freemarker."), value)
     }
     if (devMode) {
-      properties.put(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "0")
-      properties.put("template_exception_handler", "html_debug")
+      props.put(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "0")
+      props.put("template_exception_handler", "html_debug")
     } else {
-      properties.put("template_exception_handler", "rethrow")
+      props.put("template_exception_handler", "rethrow")
     }
-    properties.toMap
+    props.toMap
   }
 
   def render(url: String, datas: collection.Map[String, Any]): String = {
@@ -175,5 +176,28 @@ class Configurator extends Initializing {
     val template = this.config.getTemplate(url)
     template.process(model, buf)
     buf.toString
+  }
+
+  /** 从XML中读取配置
+   *
+   * @param is 输入流
+   * @return
+   */
+  private def fromXml(url: URL): (Boolean, Map[String, String]) = {
+    val is = url.openStream()
+    val props = (scala.xml.XML.load(is) \ "template" \ "freemarker" \ "props").headOption
+    IOs.close(is)
+    props match {
+      case Some(ps) =>
+        val isDefault = "true" == (ps \ "@default").text
+        val props = (ps \ "prop").map { p =>
+          val key = (p \ "@key").text
+          val value = p.text
+          (key, value)
+        }.toMap
+        (isDefault, props)
+      case None =>
+        (false, Map.empty)
+    }
   }
 }

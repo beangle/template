@@ -22,7 +22,7 @@ import org.beangle.template.api.DynaProfile
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 
-class DefaultTemplateEngineTest extends AnyFunSpec with Matchers {
+class DefaultTemplateEngineTest extends AnyFunSpec, Matchers {
   describe(" DefaultTemplateEngine") {
     it("render") {
       val template = DefaultTemplateEngine().forTemplate("/templates/test.ftl")

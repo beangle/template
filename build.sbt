@@ -2,7 +2,7 @@ import org.beangle.parent.Dependencies.*
 import org.beangle.parent.Settings.*
 
 ThisBuild / organization := "org.beangle.template"
-ThisBuild / version := "0.1.29-SNAPSHOT"
+ThisBuild / version := "0.2.0"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -29,7 +29,7 @@ lazy val api = (project in file("."))
   .settings(
     name := "beangle-template",
     common,
-    libraryDependencies ++= Seq(beangle_commons, freemarker % "optional"),
+    libraryDependencies ++= Seq(beangle_commons, scalaxml, freemarker % "optional"),
     libraryDependencies ++= Seq(scalatest, logback_classic % "test")
   )
 

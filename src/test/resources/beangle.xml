@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<beangle>
+  <template>
+    <freemarker>
+      <props default="true">
+        <prop key="default_encoding">UTF-8</prop>
+        <prop key="number_format">0.##</prop>
+        <prop key="date_format">yyyy-MM-dd</prop>
+        <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>
+        <prop key="cache_storage">strong:250,soft:600</prop>
+        <prop key="template_update_delay">30m</prop>
+        <prop key="localized_lookup">false</prop>
+        <prop key="tag_syntax">square_bracket</prop>
+        <prop key="localized_lookup">false</prop>
+      </props>
+    </freemarker>
+  </template>
+</beangle>
