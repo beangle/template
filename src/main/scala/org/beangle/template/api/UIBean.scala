@@ -19,11 +19,12 @@ package org.beangle.template.api
 
 import org.beangle.commons.bean.Properties
 import org.beangle.commons.lang.{Chars, Strings}
+import org.beangle.commons.logging.Logging
 
 import java.io.Writer
 import java.util as ju
 
-class UIBean(context: ComponentContext) extends Component(context) {
+class UIBean(context: ComponentContext) extends Component(context), Logging {
 
   var id: String = _
 
@@ -65,11 +66,17 @@ class UIBean(context: ComponentContext) extends Component(context) {
   }
 
   protected def getValue(obj: Any, property: String): Any = {
-    obj match {
-      case null => null
-      case map: collection.Map[_, _] => map.asInstanceOf[collection.Map[String, Any]].get(property).orNull
-      case javaMap: ju.Map[_, _] => javaMap.get(property)
-      case o: AnyRef => Properties.get[Any](o, property)
+    try {
+      obj match {
+        case null => null
+        case map: collection.Map[_, _] => map.asInstanceOf[collection.Map[String, Any]].get(property).orNull
+        case javaMap: ju.Map[_, _] => javaMap.get(property)
+        case o: AnyRef => Properties.get[Any](o, property)
+      }
+    } catch {
+      case e: Exception =>
+        logger.error("Cannot find " + Strings.capitalize(property) + " in " + obj.getClass)
+        null
     }
   }
 
