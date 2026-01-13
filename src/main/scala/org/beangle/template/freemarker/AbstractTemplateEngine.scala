@@ -20,12 +20,11 @@ package org.beangle.template.freemarker
 import freemarker.core.ParseException
 import freemarker.template.{Configuration, Template}
 import org.beangle.commons.lang.Throwables
-import org.beangle.commons.logging.Logging
 import org.beangle.template.api.{TemplateEngine, TemplateRender}
 
 import java.io.{IOException, StringReader}
 
-abstract class AbstractTemplateEngine extends TemplateEngine, Logging {
+abstract class AbstractTemplateEngine extends TemplateEngine {
   /**
    * Load template
    */
@@ -34,9 +33,7 @@ abstract class AbstractTemplateEngine extends TemplateEngine, Logging {
       config.getTemplate(templateName, "UTF-8")
     } catch {
       case e: ParseException => throw e
-      case e: IOException =>
-        logger.error(s"Couldn't load template '$templateName',loader is ${config.getTemplateLoader.getClass}")
-        throw Throwables.propagate(e)
+      case e: IOException => throw new RuntimeException(s"Couldn't load template '$templateName',loader is ${config.getTemplateLoader.getClass}", e)
     }
   }
 

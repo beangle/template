@@ -20,13 +20,11 @@ package org.beangle.template.freemarker
 import freemarker.ext.beans.{BeansWrapper, _MethodUtil}
 import freemarker.template.{TemplateMethodModelEx, TemplateModel, TemplateModelException}
 import org.beangle.commons.collection.Collections
-import org.beangle.commons.logging.Logging
 
 import java.lang.reflect.Method
 import scala.collection.immutable
 
-class SimpleMethodModel(obj: AnyRef, methods: Seq[Method], wrapper: BeansWrapper)
-  extends TemplateMethodModelEx, Logging {
+class SimpleMethodModel(obj: AnyRef, methods: Seq[Method], wrapper: BeansWrapper) extends TemplateMethodModelEx {
 
   override def exec(arguments: java.util.List[_]): AnyRef = {
     try {

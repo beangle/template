@@ -21,13 +21,13 @@ import freemarker.ext.beans.BeansWrapper
 import freemarker.template.{TemplateModel, TemplateTransformModel}
 import org.beangle.commons.bean.Properties
 import org.beangle.commons.logging.Logging
-import org.beangle.template.api.{Component, ComponentContext,Tag}
+import org.beangle.template.api.{Component, ComponentContext, Tag}
 
 import java.io.Writer
 import java.lang.reflect.Constructor
 import java.util as ju
 
-class TagModel(context: ComponentContext, clazz: Class[_ <: Component] = null) extends TemplateTransformModel with Tag with Logging  {
+class TagModel(context: ComponentContext, clazz: Class[_ <: Component] = null) extends TemplateTransformModel, Tag, Logging {
 
   private val componentCon: Constructor[_ <: Component] = if (clazz != null) clazz.getConstructor(classOf[ComponentContext]) else null
 

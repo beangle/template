@@ -25,13 +25,14 @@ object DefaultTemplateInterpreter extends TemplateInterpreter, Logging {
   private val engine = DefaultTemplateEngine()
 
   override def process(contents: String, model: Any): String = {
-    try
+    try {
       val render = engine.forString(safeRewrite(contents))
       render.render(model)
-    catch
+    } catch {
       case ex: Exception =>
         logger.error(s"process ${contents} error", ex)
         contents
+    }
   }
 
   def safeRewrite(text: String): String = {

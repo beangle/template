@@ -18,8 +18,6 @@
 package org.beangle.template.api
 
 /** 模板解析器
- *
- * @param engine
  */
 trait TemplateInterpreter {
   def process(contents: String, model: Any): String
