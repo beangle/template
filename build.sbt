@@ -2,7 +2,7 @@ import org.beangle.parent.Dependencies.*
 import org.beangle.parent.Settings.*
 
 ThisBuild / organization := "org.beangle.template"
-ThisBuild / version := "0.2.2-SNAPSHOT"
+ThisBuild / version := "0.2.2"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -23,7 +23,7 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Template Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "5.6.33"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "5.7.0"
 
 lazy val api = (project in file("."))
   .settings(

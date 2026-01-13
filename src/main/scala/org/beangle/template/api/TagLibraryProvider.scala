@@ -21,11 +21,11 @@ import org.beangle.commons.lang.annotation.spi
 
 @spi
 trait TagLibrary {
-  def models(): AnyRef
+  def models: AnyRef
 }
 
 @spi
 trait TagLibraryProvider {
 
-  def tagLibraries: Map[String, TagLibrary]
+  def libraries: Map[String, TagLibrary]
 }
