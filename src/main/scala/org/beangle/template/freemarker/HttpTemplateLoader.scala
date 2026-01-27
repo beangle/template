@@ -23,7 +23,6 @@ import org.beangle.commons.net.Networks
 import org.beangle.commons.net.http.HttpUtils
 
 import java.io.{IOException, InputStreamReader, Reader}
-import java.net.URI
 
 class HttpTemplateLoader(val pattern: String, preload: Boolean) extends TemplateLoader {
   private var files: Set[String] = Set.empty
@@ -45,9 +44,8 @@ class HttpTemplateLoader(val pattern: String, preload: Boolean) extends Template
     if (preload) {
       if (files.contains(name)) new URLTemplateSource(Networks.url(getURL(name))) else null
     } else {
-      val url = Networks.url(getURL(name))
-      val status = HttpUtils.access(url)
-      if (status.isOk) new URLTemplateSource(url) else null
+      val url = getURL(name)
+      if (HttpUtils.isAlive(url)) new URLTemplateSource(Networks.url(url)) else null
     }
   }
 
