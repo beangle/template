@@ -20,10 +20,12 @@ package org.beangle.template.freemarker
 import freemarker.cache.{FileTemplateLoader, MultiTemplateLoader, TemplateLoader}
 import freemarker.template.{Configuration, ObjectWrapper, SimpleHash}
 import org.beangle.commons.bean.Initializing
+import org.beangle.commons.config.XmlConfigs
 import org.beangle.commons.io.IOs
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.Strings.{split, substringAfter}
 import org.beangle.commons.lang.annotation.description
+import org.beangle.commons.xml.{Document, Node}
 import org.beangle.template.api.DynaProfile
 
 import java.io.{File, IOException, StringWriter}
@@ -145,9 +147,11 @@ class Configurator extends Initializing {
     val props = new collection.mutable.HashMap[String, String]
 
     val overrides = new collection.mutable.HashMap[String, String]
+    val doc = XmlConfigs.load("classpath*:beangle.xml")
+
     // 1. read beangle.xml
-    for (url <- ClassLoaders.getResources("beangle.xml")) {
-      val rs = fromXml(url)
+    (doc \ "template" \ "freemarker" \ "props") foreach { ps =>
+      val rs = fromXml(ps)
       if (rs._1) props.addAll(rs._2) else overrides.addAll(rs._2)
     }
     props.addAll(overrides)
@@ -183,21 +187,13 @@ class Configurator extends Initializing {
    * @param is 输入流
    * @return
    */
-  private def fromXml(url: URL): (Boolean, Map[String, String]) = {
-    val is = url.openStream()
-    val props = (scala.xml.XML.load(is) \ "template" \ "freemarker" \ "props").headOption
-    IOs.close(is)
-    props match {
-      case Some(ps) =>
-        val isDefault = "true" == (ps \ "@default").text
-        val props = (ps \ "prop").map { p =>
-          val key = (p \ "@key").text
-          val value = p.text
-          (key, value)
-        }.toMap
-        (isDefault, props)
-      case None =>
-        (false, Map.empty)
-    }
+  private def fromXml(ps: Node): (Boolean, Map[String, String]) = {
+    val isDefault = "true" == (ps \ "@default").text
+    val props = (ps \ "prop").map { p =>
+      val key = (p \ "@key").text
+      val value = p.text
+      (key, value)
+    }.toMap
+    (isDefault, props)
   }
 }

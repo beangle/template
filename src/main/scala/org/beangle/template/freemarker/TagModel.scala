@@ -20,14 +20,14 @@ package org.beangle.template.freemarker
 import freemarker.ext.beans.BeansWrapper
 import freemarker.template.{TemplateModel, TemplateTransformModel}
 import org.beangle.commons.bean.Properties
-import org.beangle.commons.logging.Logging
+import org.beangle.template.TemplateLogger
 import org.beangle.template.api.{Component, ComponentContext, Tag}
 
 import java.io.Writer
 import java.lang.reflect.Constructor
 import java.util as ju
 
-class TagModel(context: ComponentContext, clazz: Class[_ <: Component] = null) extends TemplateTransformModel, Tag, Logging {
+class TagModel(context: ComponentContext, clazz: Class[_ <: Component] = null) extends TemplateTransformModel, Tag {
 
   private val componentCon: Constructor[_ <: Component] = if (clazz != null) clazz.getConstructor(classOf[ComponentContext]) else null
 
@@ -49,8 +49,7 @@ class TagModel(context: ComponentContext, clazz: Class[_ <: Component] = null) e
           try {
             Properties.set(bean, property, unwrapped)
           } catch {
-            case e: Exception =>
-              logger.error("invoke set property [" + property + "] with value " + unwrapped, e)
+            case e: Exception => TemplateLogger.error("invoke set property [" + property + "] with value " + unwrapped, e)
           }
         } else {
           bean.parameters.put(key, value)

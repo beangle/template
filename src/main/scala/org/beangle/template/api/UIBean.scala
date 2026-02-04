@@ -19,12 +19,12 @@ package org.beangle.template.api
 
 import org.beangle.commons.bean.Properties
 import org.beangle.commons.lang.{Chars, Strings}
-import org.beangle.commons.logging.Logging
+import org.beangle.template.TemplateLogger
 
 import java.io.Writer
 import java.util as ju
 
-class UIBean(context: ComponentContext) extends Component(context), Logging {
+class UIBean(context: ComponentContext) extends Component(context) {
 
   var id: String = _
 
@@ -75,7 +75,7 @@ class UIBean(context: ComponentContext) extends Component(context), Logging {
       }
     } catch {
       case e: Exception =>
-        logger.error("Cannot find " + Strings.capitalize(property) + " in " + obj.getClass)
+        TemplateLogger.error("Cannot find " + Strings.capitalize(property) + " in " + obj.getClass)
         null
     }
   }

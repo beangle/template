@@ -23,14 +23,14 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Template Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "5.8.1"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.0.0-SNAPSHOT"
 
 lazy val api = (project in file("."))
   .settings(
     name := "beangle-template",
     common,
-    libraryDependencies ++= Seq(beangle_commons, scalaxml, freemarker % "optional"),
-    libraryDependencies ++= Seq(scalatest, slf4j, logback_classic % "test")
+    libraryDependencies ++= Seq(beangle_commons, slf4j, freemarker % "optional"),
+    libraryDependencies ++= Seq(scalatest, logback_classic % "test")
   )
 
 ThisBuild / Test / parallelExecution := false

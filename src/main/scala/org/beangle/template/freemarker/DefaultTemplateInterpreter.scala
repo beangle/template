@@ -17,10 +17,10 @@
 
 package org.beangle.template.freemarker
 
-import org.beangle.commons.logging.Logging
+import org.beangle.template.TemplateLogger
 import org.beangle.template.api.TemplateInterpreter
 
-object DefaultTemplateInterpreter extends TemplateInterpreter, Logging {
+object DefaultTemplateInterpreter extends TemplateInterpreter {
 
   private val engine = DefaultTemplateEngine()
 
@@ -30,7 +30,7 @@ object DefaultTemplateInterpreter extends TemplateInterpreter, Logging {
       render.render(model)
     } catch {
       case ex: Exception =>
-        logger.error(s"process ${contents} error", ex)
+        TemplateLogger.error(s"process ${contents} error", ex)
         contents
     }
   }
