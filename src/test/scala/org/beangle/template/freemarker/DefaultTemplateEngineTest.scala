@@ -17,6 +17,7 @@
 
 package org.beangle.template.freemarker
 
+import org.beangle.commons.lang.ScopedContext
 import org.beangle.commons.lang.reflect.BeanInfos
 import org.beangle.template.api.DynaProfile
 import org.scalatest.funspec.AnyFunSpec
@@ -32,11 +33,13 @@ class DefaultTemplateEngineTest extends AnyFunSpec, Matchers {
     }
 
     it("profile loader") {
-      DynaProfile.set("dev")
-      val template = DefaultTemplateEngine().forTemplate("/templates/index.ftl")
-      val datas = Map("name" -> "world!")
-      val html = template.render(datas)
-      assert(html.nonEmpty)
+      ScopedContext.runWith() {
+        DynaProfile.set("dev")
+        val template = DefaultTemplateEngine().forTemplate("/templates/index.ftl")
+        val datas = Map("name" -> "world!")
+        val html = template.render(datas)
+        assert(html.nonEmpty)
+      }
     }
   }
 }
