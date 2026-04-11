@@ -17,11 +17,11 @@
 
 package org.beangle.template.api
 
-import org.beangle.commons.lang.Strings
+import org.beangle.commons.lang.{ScopedContext, Strings}
 
 object DynaProfile {
 
-  private val profile = new ThreadLocal[String]
+  private val key = ScopedContext.Key[String]("beangle.template.profile")
 
   /** Not starts with /,but end with / */
   def process(pre: String): String = {
@@ -37,18 +37,18 @@ object DynaProfile {
 
   def set(p: Any): Unit = {
     p match
-      case null => profile.remove()
-      case None => profile.remove()
-      case name: String => if name.isBlank then profile.remove() else profile.set(process(name))
-      case _ => profile.set(process(p.toString))
+      case null => ScopedContext.remove(key)
+      case None => ScopedContext.remove(key)
+      case name: String => if name.isBlank then ScopedContext.remove(key) else ScopedContext.put(key, process(name))
+      case _ => ScopedContext.put(key, process(p.toString))
   }
 
   def remove(): Unit = {
-    profile.remove()
+    ScopedContext.remove(key)
   }
 
   def get: Option[String] = {
-    Option(profile.get())
+    ScopedContext.get(key)
   }
 
   def concat(prefix: String, p: String): String = {
@@ -60,6 +60,9 @@ object DynaProfile {
   }
 
   def path(p: String): String = {
-    concat(profile.get(), p)
+    get match {
+      case None => p
+      case Some(pf) => concat(pf, p)
+    }
   }
 }
