@@ -23,7 +23,7 @@ ThisBuild / developers := List(
 ThisBuild / description := "The Beangle Template Library"
 ThisBuild / homepage := Some(url("http://beangle.github.io/template/index.html"))
 
-val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.1.0"
+val beangle_commons = "org.beangle.commons" % "beangle-commons" % "6.2.0"
 
 lazy val api = (project in file("."))
   .settings(

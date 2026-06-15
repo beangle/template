@@ -20,6 +20,7 @@ package org.beangle.template.freemarker
 import freemarker.cache.StrongCacheStorage
 import freemarker.template.{Configuration, SimpleHash}
 import org.beangle.commons.bean.Initializing
+import org.beangle.commons.config.Enviroment
 import org.beangle.commons.io.IOs
 import org.beangle.commons.lang.ClassLoaders
 import org.beangle.commons.lang.annotation.description
@@ -42,8 +43,6 @@ import java.util as ju
 class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTemplateEngine, TagTemplateEngine, Initializing {
 
   val config = new Configuration(Configuration.VERSION_2_3_32)
-
-  var devMode: Boolean = false
 
   @throws(classOf[Exception])
   override def renderTo(template: String, component: Any, writer: Writer): Unit = {
@@ -75,7 +74,7 @@ class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTempl
     config.setObjectWrapper(wrapper)
     config.setTemplateLoader(new ThemeTemplateLoader(new ClassTemplateLoader()))
 
-    if (devMode) config.setTemplateUpdateDelayMilliseconds(0)
+    if (Enviroment.isDevMode) config.setTemplateUpdateDelayMilliseconds(0)
 
     config.setCacheStorage(new StrongCacheStorage())
     config.setTagSyntax(Configuration.SQUARE_BRACKET_TAG_SYNTAX)
