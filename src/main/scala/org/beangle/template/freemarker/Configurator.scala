@@ -21,7 +21,7 @@ import freemarker.cache.{FileTemplateLoader, MultiTemplateLoader, TemplateLoader
 import freemarker.template.{Configuration, ObjectWrapper, SimpleHash}
 import org.beangle.commons.bean.Initializing
 import org.beangle.commons.cdi.Container
-import org.beangle.commons.config.{Enviroment, MutableEnviroment, XmlConfigs}
+import org.beangle.commons.config.{Environment, MutableEnvironment, XmlConfigs}
 import org.beangle.commons.lang.Strings.{split, substringAfter}
 import org.beangle.commons.lang.annotation.description
 import org.beangle.template.api.DynaProfile
@@ -122,7 +122,7 @@ class Configurator extends Initializing {
         case e: IOException => throw new RuntimeException("templatePath: " + path + " cannot be accessed", e)
       }
     } else if (path.startsWith("http://") || path.startsWith("https://")) {
-      new HttpTemplateLoader(path, !Enviroment.isDevMode)
+      new HttpTemplateLoader(path, !Environment.isDevMode)
     } else {
       throw new RuntimeException("templatePath: " + path
         + " is not well-formed. Use [class://|file://] seperated with ,")
@@ -151,10 +151,10 @@ class Configurator extends Initializing {
       props.addAll(defaults)
     }
     // 2. enviroment properties
-    val env = getEnviroment
+    val env = getEnvironment
     props.addAll(env.getNested("template.freemarker.settings").map(x => (x._1, x._2.toString)))
 
-    if (Enviroment.isDevMode) {
+    if (Environment.isDevMode) {
       props.put(Configuration.TEMPLATE_UPDATE_DELAY_KEY, "0")
       props.put("template_exception_handler", "html_debug")
     } else {
@@ -168,9 +168,9 @@ class Configurator extends Initializing {
     else container.getBean(classOf[XmlConfigs]).getOrElse(new XmlConfigs)
   }
 
-  private def getEnviroment: Enviroment = {
-    if (null == container) MutableEnviroment.system
-    else container.getBean(classOf[Enviroment]).getOrElse(MutableEnviroment.system)
+  private def getEnvironment: Environment = {
+    if (null == container) MutableEnvironment.system
+    else container.getBean(classOf[Environment]).getOrElse(MutableEnvironment.system)
   }
 
   def render(url: String, datas: collection.Map[String, Any]): String = {
