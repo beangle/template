@@ -59,7 +59,11 @@ class ResetCallbackWriter extends Writer with TransformControl {
 
   def onStart(): Int = {
     bean.context.push(bean)
-    if (bean.start(this)) EVALUATE_BODY else SKIP_BODY
+    if (bean.start(this)) EVALUATE_BODY
+    else {
+      bean.context.pop()
+      SKIP_BODY
+    }
   }
 
   def afterBody(): Int = {
@@ -78,6 +82,7 @@ class ResetCallbackWriter extends Writer with TransformControl {
   }
 
   def onError(throwable: Throwable): Unit = {
+    bean.context.pop()
     throw throwable
   }
 
