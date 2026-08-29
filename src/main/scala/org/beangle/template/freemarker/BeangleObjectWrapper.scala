@@ -104,7 +104,7 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
           }
         } else {
           val clazz = obj.getClass
-          if BeanInfos.cache.contains(clazz) then new BeangleBeanModel(obj, this) else GenericObjectModel(obj, this)
+          if BeanInfos.cached(clazz) then new BeangleBeanModel(obj, this) else GenericObjectModel(obj, this)
         }
     }
   }

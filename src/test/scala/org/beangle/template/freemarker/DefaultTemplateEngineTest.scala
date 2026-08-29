@@ -28,7 +28,7 @@ class DefaultTemplateEngineTest extends AnyFunSpec, Matchers {
     it("render") {
       val template = DefaultTemplateEngine().forTemplate("/templates/test.ftl")
       val datas = Map("name" -> "world!", "scheme" -> new Scheme)
-      val a = BeanInfos.of(classOf[Scheme])
+      val a = BeanInfos.get(classOf[Scheme])
       println(template.render(datas))
     }
 
