@@ -33,7 +33,7 @@ import scala.jdk.javaapi.CollectionConverters.asJava
 
 object BeangleObjectWrapper {
   def wrapperConfig(): BeansWrapperConfiguration = {
-    val config = new DefaultObjectWrapperConfiguration(Configuration.VERSION_2_3_33) {}
+    val config = new DefaultObjectWrapperConfiguration(Configuration.VERSION_2_3_35) {}
     config.setMethodAppearanceFineTuner(new ScalaMethodAppearanceFineTuner)
     config.setExposeFields(true)
     config
@@ -85,6 +85,12 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
 
       // java collections
       case collection: ju.Collection[_] => new SimpleSequence(collection, this)
+      case entry: ju.Map.Entry[_, _] =>
+        // 兜底：防止意外传入 Map.Entry（避免 GraalVM 反射 Map$Entry 问题）
+        val map = new ju.HashMap[String, Any](2)
+        map.put("key", entry.getKey)
+        map.put("value", entry.getValue)
+        new FriendlyMapModel(map, this)
       case map: ju.Map[_, _] => new FriendlyMapModel(map, this)
       case iter: ju.Iterator[_] => new SimpleCollection(iter, this)
       // misc
