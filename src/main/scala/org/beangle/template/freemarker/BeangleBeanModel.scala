@@ -21,12 +21,10 @@ import freemarker.core.CollectionAndSequence
 import freemarker.ext.beans.BeansWrapper
 import freemarker.ext.util.WrapperTemplateModel
 import freemarker.template.*
-import org.beangle.commons.lang.reflect.BeanInfos
+import org.beangle.commons.lang.reflect.{BeanInfo, BeanInfos}
 
-class BeangleBeanModel(obj: AnyRef, wrapper: BeansWrapper) extends TemplateHashModelEx,
+class BeangleBeanModel(obj: AnyRef, beaninfo: BeanInfo, wrapper: BeansWrapper) extends TemplateHashModelEx,
   AdapterTemplateModel, WrapperTemplateModel, TemplateModelWithAPISupport, TemplateScalarModel {
-
-  private val beaninfo = BeanInfos.get(obj.getClass)
 
   override def get(key: String): TemplateModel = {
     beaninfo.getGetter(key) match {

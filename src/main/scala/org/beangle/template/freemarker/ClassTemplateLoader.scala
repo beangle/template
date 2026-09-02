@@ -28,6 +28,7 @@ class ClassTemplateLoader(prefixStr: String = null) extends URLTemplateLoader {
   private val prefix = DynaProfile.process(prefixStr)
 
   protected def getURL(name: String): URL = {
+    TemplateNameUtils.checkInsideBaseDir(name)
     var url: Option[URL] = None
     if (prefix.nonEmpty) url = ClassLoaders.getResource(prefix + name)
     url match

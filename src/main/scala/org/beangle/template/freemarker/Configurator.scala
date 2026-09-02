@@ -51,7 +51,7 @@ object Configurator {
 @description("Freemarker配置提供者")
 class Configurator extends Initializing {
 
-  val config = new Configuration(Configuration.VERSION_2_3_33)
+  val config = new Configuration(Configuration.VERSION_2_3_35)
 
   var contentType: String = _
 

@@ -41,6 +41,7 @@ class HttpTemplateLoader(val pattern: String, preload: Boolean) extends Template
 
   @throws[IOException]
   override def findTemplateSource(name: String): Any = {
+    TemplateNameUtils.checkInsideBaseDir(name)
     if (preload) {
       if (files.contains(name)) new URLTemplateSource(Networks.url(getURL(name))) else null
     } else {

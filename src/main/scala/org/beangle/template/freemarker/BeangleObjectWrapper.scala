@@ -17,7 +17,6 @@
 
 package org.beangle.template.freemarker
 
-import freemarker.core.CollectionAndSequence
 import freemarker.ext.beans.*
 import freemarker.ext.beans.BeansWrapper.{MethodAppearanceDecision, MethodAppearanceDecisionInput}
 import freemarker.template.*
@@ -109,34 +108,12 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
             new SimpleSequence(ju.Arrays.asList(obj.asInstanceOf[Array[_]]: _*), this)
           }
         } else {
-          val clazz = obj.getClass
-          if BeanInfos.cached(clazz) then new BeangleBeanModel(obj, this) else GenericObjectModel(obj, this)
+          BeanInfos.find(obj.getClass) match {
+            case Some(bi) => BeangleBeanModel(obj, bi, this)
+            case None => new SimpleScalar(obj.toString)
+          }
         }
     }
-  }
-}
-
-/**
- * Attempting to get the best of both worlds of FM's MapModel and
- * simplemapmodel, by reimplementing the isEmpty(), keySet() and values()
- * methods. ?keys and ?values built-ins are thus available, just as well as
- * plain Map methods.
- */
-class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends MapModel(map, wrapper) with TemplateHashModelEx
-  with TemplateMethodModelEx with AdapterTemplateModel {
-
-  override def isEmpty: Boolean = {
-    `object`.asInstanceOf[ju.Map[_, _]].isEmpty
-  }
-
-  // 此处实现与MapModel不同，MapModel中复制了一个集合,同时不要复制object中的keys
-  override protected def keySet(): ju.Set[_] = {
-    `object`.asInstanceOf[ju.Map[_, _]].keySet()
-  }
-
-  // add feature
-  override def values(): TemplateCollectionModel = {
-    new CollectionAndSequence(new SimpleSequence(`object`.asInstanceOf[ju.Map[_, _]].values(), wrapper))
   }
 }
 

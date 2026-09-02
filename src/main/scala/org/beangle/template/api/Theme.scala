@@ -20,6 +20,8 @@ package org.beangle.template.api
 import org.beangle.commons.io.{IOs, ResourcePatternResolver}
 import org.beangle.commons.lang.Strings
 
+import java.net.URL
+
 object Themes {
 
   private val themes = loadThemeProps()
@@ -44,14 +46,31 @@ object Themes {
     val urls = resolver.getResources("themes/**/theme.properties")
     urls foreach { url =>
       val themeName = Strings.substringBetween(url.getPath, "themes/", "/theme.properties")
-      var parent = IOs.readJavaProperties(url).get("parent").orNull
-      if Strings.isBlank(parent) then parent = null
-      if (themeName.contains("/") && Strings.isNotBlank(parent) && !parent.contains("/")) {
-        parent = Strings.substringBefore(themeName, "/") + "/" + parent.trim
+      themePropMap.put(themeName, loadTheme(themeName, url))
+    }
+    // native-image 下 classpath 目录枚举不可用（注册资源只能按精确名查找），
+    // 扫描结果为空时回退到 themes/themes.list 精确资源：主题提供方在
+    // themes 目录下维护该清单，每行一个主题名（如 bootstrap/html）。
+    if (themePropMap.isEmpty) {
+      val listUrls = resolver.getResources("themes/themes.list")
+      val themeNames = listUrls.flatMap(url => IOs.readLines(url.openStream()))
+        .map(_.trim).filter(_.nonEmpty).distinct
+      themeNames foreach { themeName =>
+        resolver.getResources(s"themes/$themeName/theme.properties").headOption foreach { url =>
+          themePropMap.put(themeName, loadTheme(themeName, url))
+        }
       }
-      themePropMap.put(themeName, Theme(themeName, Option(parent)))
     }
     themePropMap.toMap
+  }
+
+  private def loadTheme(themeName: String, url: URL): Theme = {
+    var parent = IOs.readJavaProperties(url).get("parent").orNull
+    if Strings.isBlank(parent) then parent = null
+    if (themeName.contains("/") && Strings.isNotBlank(parent) && !parent.contains("/")) {
+      parent = Strings.substringBefore(themeName, "/") + "/" + parent.trim
+    }
+    Theme(themeName, Option(parent))
   }
 
   private def loadDefault(): Theme = {
