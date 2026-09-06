@@ -25,7 +25,8 @@ import org.beangle.template.api.*
  *
  * 注册模板机制面的资源：freemarker 模板文件（`*.ftl`）由模板引擎在运行期
  * 按名加载，native 镜像需要内嵌；`themes` 目录下主题资源（theme.properties、
- * themes.list）供 `Themes` 精确名查找（native 下目录枚举不可用）。
+ * themes.list）供 `Themes` 精确名查找（native 下目录枚举不可用）；引擎配置
+ * `tag.properties` 在 `DefaultTagTemplateEngine` 按类路径名加载。
  * 使用方无需在 resource-config.json 中手写。
  * 另注册 UIBean 层级：tag 组件（bui 等）继承 `Component`/`UIBean`，`TagModel`
  * 经 `clazz.getConstructor(classOf[ComponentContext])` 实例化、`Properties.set`
@@ -41,6 +42,7 @@ class TemplateAotHints extends AotHintRegistrar {
   override def registering(): Unit = {
     hints.registerPattern(".*\\.ftl")
     hints.registerPattern("themes/.*")
+    hints.registerPattern("org/beangle/template/freemarker/tag\\.properties")
     // 模板模型基类
     hints.registerType(classOf[AbstractModels])
     hints.registerType(classOf[Configuration])
