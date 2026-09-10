@@ -40,9 +40,13 @@ class TemplateAotHints extends AotHintRegistrar {
     AotPolicy.Category.DeclaredFields))
 
   override def registering(): Unit = {
-    hints.registerPattern(".*\\.ftl")
-    hints.registerPattern("themes/.*")
-    hints.registerPattern("org/beangle/template/freemarker/tag\\.properties")
+    // freemarker 模板：按 classpath 实际目录收紧（org/beangle 各库与应用、
+    // bui 的 components 组件），避免以 ** 开头的泛化 glob
+    hints.registerPattern("org/beangle/**/*.ftl", "components/**/*.ftl")
+    hints.registerPattern("themes/**")
+    // freemarker 引擎自身资源：版本属性与扩展配置（ext/beans/unsafeMethods.properties）
+    hints.registerPattern("freemarker/**/*.properties")
+    hints.registerPattern("org/beangle/template/freemarker/tag.properties")
     // 模板模型基类
     hints.registerType(classOf[AbstractModels])
     hints.registerType(classOf[Configuration])
