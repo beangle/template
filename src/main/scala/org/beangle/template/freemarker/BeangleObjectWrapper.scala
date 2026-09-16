@@ -26,6 +26,7 @@ import org.beangle.commons.lang.reflect.BeanInfos
 import java.beans.PropertyDescriptor
 import java.lang.reflect.{Method, Modifier}
 import java.time.*
+import java.time.chrono.{ChronoLocalDate, ChronoLocalDateTime, ChronoZonedDateTime}
 import java.time.temporal.Temporal
 import java.util as ju
 import scala.jdk.javaapi.CollectionConverters.asJava
@@ -58,11 +59,22 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
         temporal match {
           case t: Instant => new SimpleDate(java.util.Date.from(t), TemplateDateModel.DATETIME)
           case t: ZonedDateTime => new SimpleDate(java.util.Date.from(t.toInstant), TemplateDateModel.DATETIME)
+          case t: ChronoZonedDateTime[_] => new SimpleDate(java.util.Date.from(t.toInstant), TemplateDateModel.DATETIME)
+          case t: OffsetDateTime => new SimpleDate(java.util.Date.from(t.toInstant), TemplateDateModel.DATETIME)
           case t: LocalDateTime => new SimpleDate(java.util.Date.from(t.atZone(ZoneId.systemDefault()).toInstant), TemplateDateModel.DATETIME)
+          case t: ChronoLocalDateTime[_] => new SimpleDate(java.util.Date.from(t.atZone(ZoneId.systemDefault()).toInstant), TemplateDateModel.DATETIME)
           case t: LocalDate => new SimpleDate(java.sql.Date.valueOf(t), TemplateDateModel.DATE)
+          case t: ChronoLocalDate => new SimpleDate(java.sql.Date.valueOf(LocalDate.from(t)), TemplateDateModel.DATE)
           case t: LocalTime => new SimpleDate(java.sql.Time.valueOf(t))
           case t: YearMonth => new SimpleDate(java.sql.Date.valueOf(t.atDay(1)))
+          case t: Year => new SimpleDate(java.sql.Date.valueOf(t.atDay(1)))
+          case t: OffsetTime => new SimpleDate(java.sql.Time.valueOf(t.toLocalTime))
+          //其余 Temporal 实现（自定义类型等）退回 ISO 文本，不让 MatchError 打断整页渲染
+          case t => new SimpleScalar(t.toString)
         }
+      //Duration/Period 是 TemporalAmount，但不是 Temporal：单独建模以支持字段读取与方法调用
+      case d: Duration => new DurationModel(d, this)
+      case p: Period => new PeriodModel(p, this)
       case date: ju.Date =>
         date match {
           case sdate: java.sql.Date => new SimpleDate(sdate)
