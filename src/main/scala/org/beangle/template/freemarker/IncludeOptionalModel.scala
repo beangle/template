@@ -25,7 +25,7 @@ import freemarker.template.{TemplateDirectiveBody, TemplateDirectiveModel, Templ
  */
 class IncludeOptionalModel extends TemplateDirectiveModel {
 
-  override def execute(env: Environment, map: java.util.Map[_, _], templateModel: Array[TemplateModel],
+  override def execute(env: Environment, map: java.util.Map[?, ?], templateModel: Array[TemplateModel],
                        directiveBody: TemplateDirectiveBody): Unit = {
     val currentTemplateName = env.getCurrentNamespace.getTemplate.getName
     val path = map.get("path").toString

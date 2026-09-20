@@ -22,6 +22,7 @@ import freemarker.template.TransformControl.{END_EVALUATION, EVALUATE_BODY, REPE
 import org.beangle.template.api.Component
 
 import java.io.{StringWriter, Writer}
+import scala.compiletime.uninitialized
 
 /**
  * ResetCallbackWriter
@@ -29,9 +30,9 @@ import java.io.{StringWriter, Writer}
  * @since 2.4
  */
 class ResetCallbackWriter extends Writer with TransformControl {
-  private var bean: Component = _
-  private var writer: Writer = _
-  private var body: StringWriter = _
+  private var bean: Component = uninitialized
+  private var writer: Writer = uninitialized
+  private var body: StringWriter = uninitialized
   private var _afterBody = false
 
   def this(bean: Component, writer: Writer) = {

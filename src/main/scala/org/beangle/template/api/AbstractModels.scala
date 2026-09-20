@@ -24,9 +24,9 @@ import java.{util => ju}
  */
 abstract class AbstractModels(val context: ComponentContext) {
 
-  val models = new ju.HashMap[Class[_], Tag]
+  val models = new ju.HashMap[Class[?], Tag]
 
-  protected def get(clazz: Class[_ <: Component]): Tag = {
+  protected def get(clazz: Class[? <: Component]): Tag = {
     var model = models.get(clazz)
     if (null == model) {
       model = context.engine.newTag(context,clazz)

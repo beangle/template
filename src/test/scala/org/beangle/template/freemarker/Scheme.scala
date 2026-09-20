@@ -18,11 +18,12 @@
 package org.beangle.template.freemarker
 
 import java.time.Instant
+import scala.compiletime.uninitialized
 
 class Scheme {
 
-  var beginAt: Instant = _
-  var endAt: Instant = _
+  var beginAt: Instant = uninitialized
+  var endAt: Instant = uninitialized
 
   def canApply(): Boolean = {
     val now = Instant.now

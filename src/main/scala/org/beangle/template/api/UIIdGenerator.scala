@@ -23,14 +23,14 @@ import scala.util.Random
 
 trait UIIdGenerator {
 
-  def generate(clazz: Class[_]): String
+  def generate(clazz: Class[?]): String
 }
 
 class RandomIdGenerator extends UIIdGenerator {
 
   val seed = new Random()
 
-  def generate(clazz: Class[_]): String = {
+  def generate(clazz: Class[?]): String = {
     val nextInt = {
       val next = seed.nextInt()
       if (next == Integer.MIN_VALUE) Integer.MAX_VALUE else Math.abs(next)
@@ -47,9 +47,9 @@ class RandomIdGenerator extends UIIdGenerator {
  */
 class IndexableIdGenerator(seed: String) extends UIIdGenerator {
 
-  private val uiIndexes = new collection.mutable.HashMap[Class[_], UIIndex]
+  private val uiIndexes = new collection.mutable.HashMap[Class[?], UIIndex]
 
-  def generate(clazz: Class[_]): String = {
+  def generate(clazz: Class[?]): String = {
     uiIndexes.getOrElseUpdate(clazz, new UIIndex(Strings.uncapitalize(clazz.getSimpleName))).genId(seed)
   }
 }

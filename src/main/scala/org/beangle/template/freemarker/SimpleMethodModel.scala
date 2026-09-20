@@ -26,7 +26,7 @@ import scala.collection.immutable
 
 class SimpleMethodModel(obj: AnyRef, methods: Seq[Method], wrapper: BeansWrapper) extends TemplateMethodModelEx {
 
-  override def exec(arguments: java.util.List[_]): AnyRef = {
+  override def exec(arguments: java.util.List[?]): AnyRef = {
     try {
       val args = unwrapArguments(arguments, wrapper)
       findMethod(args) match {
@@ -55,32 +55,32 @@ class SimpleMethodModel(obj: AnyRef, methods: Seq[Method], wrapper: BeansWrapper
                   pIndex += 1
                 }
               }
-              method.invoke(obj, newArgs.toSeq: _*)
+              method.invoke(obj, newArgs.toSeq*)
             } else {
               val lastIdx = paramTypes.length - 1
-              if (paramTypes(lastIdx) == classOf[immutable.Seq[_]]) { //Scala函数，最后一个参数是可变参数
+              if (paramTypes(lastIdx) == classOf[immutable.Seq[?]]) { //Scala函数，最后一个参数是可变参数
                 if (args.length == paramTypes.length) { //1. 将最后一个参数转变为为可变参数
-                  if (!classOf[immutable.Seq[_]].isAssignableFrom(args(lastIdx).getClass)) {
+                  if (!classOf[immutable.Seq[?]].isAssignableFrom(args(lastIdx).getClass)) {
                     args(lastIdx) = immutable.Seq(args(lastIdx))
                   }
-                  method.invoke(obj, args.toSeq: _*)
+                  method.invoke(obj, args.toSeq*)
                 } else if (args.length > paramTypes.length) { //2.将剩余参数转变为可变参数
                   val newArgs = Collections.newBuffer[AnyRef]
                   (0 until lastIdx) foreach { i => newArgs.addOne(args(i)) }
                   val lastArgs = Collections.newBuffer[AnyRef]
                   (lastIdx until args.length) foreach { i => lastArgs.addOne(args(i)) }
                   newArgs.addOne(lastArgs.toSeq)
-                  method.invoke(obj, newArgs.toSeq: _*)
+                  method.invoke(obj, newArgs.toSeq*)
                 } else if (args.length == paramTypes.length - 1) { //3. 将最后一个参数设置为空数组
                   val newArgs = Collections.newBuffer[AnyRef]
                   newArgs.addAll(args)
                   newArgs.addOne(List.empty)
-                  method.invoke(obj, newArgs.toSeq: _*)
+                  method.invoke(obj, newArgs.toSeq*)
                 } else { //4. 参数个数不匹配
                   throw new IllegalArgumentException(s"${method.getName} need ${paramTypes.length} params,but receive only ${args.length} arguments.")
                 }
               } else { //normal method
-                method.invoke(obj, args: _*)
+                method.invoke(obj, args*)
               }
             }
           if (method.getReturnType == classOf[Unit])
@@ -113,7 +113,7 @@ class SimpleMethodModel(obj: AnyRef, methods: Seq[Method], wrapper: BeansWrapper
     }
   }
 
-  private def unwrapArguments(arguments: java.util.List[_], wrapper: BeansWrapper): Array[AnyRef] = {
+  private def unwrapArguments(arguments: java.util.List[?], wrapper: BeansWrapper): Array[AnyRef] = {
     if (arguments eq null) return Array.empty[AnyRef]
     val args = new Array[AnyRef](arguments.size())
     var i = 0

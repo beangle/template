@@ -27,6 +27,7 @@ import org.beangle.commons.lang.annotation.description
 import org.beangle.template.api.DynaProfile
 
 import java.io.{File, IOException, StringWriter}
+import scala.compiletime.uninitialized
 
 object Configurator {
 
@@ -53,11 +54,11 @@ class Configurator extends Initializing {
 
   val config = new Configuration(Configuration.VERSION_2_3_35)
 
-  var contentType: String = _
+  var contentType: String = uninitialized
 
-  var container: Container = _
+  var container: Container = uninitialized
 
-  var templatePath: String = _
+  var templatePath: String = uninitialized
 
   override def init(): Unit = {
     config.setDefaultEncoding("UTF-8")

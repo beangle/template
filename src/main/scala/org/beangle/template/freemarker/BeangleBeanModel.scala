@@ -78,5 +78,5 @@ class BeangleBeanModel(obj: AnyRef, beaninfo: BeanInfo, wrapper: BeansWrapper) e
 
   override def getWrappedObject: AnyRef = obj
 
-  override def getAdaptedObject(hint: Class[_]): AnyRef = obj
+  override def getAdaptedObject(hint: Class[?]): AnyRef = obj
 }

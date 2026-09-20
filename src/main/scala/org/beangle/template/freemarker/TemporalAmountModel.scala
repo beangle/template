@@ -67,7 +67,7 @@ abstract class TemporalAmountModel[T <: TemporalAmount](amount: T, wrapper: Obje
 
   override def getWrappedObject: AnyRef = amount
 
-  override def getAdaptedObject(hint: Class[_]): AnyRef = amount
+  override def getAdaptedObject(hint: Class[?]): AnyRef = amount
 }
 
 object TemporalAmountModel {
@@ -76,7 +76,7 @@ object TemporalAmountModel {
   private[freemarker] class NumberMember(name: String, value: => Long)
     extends TemplateMethodModelEx, TemplateNumberModel {
 
-    override def exec(arguments: ju.List[_]): AnyRef = {
+    override def exec(arguments: ju.List[?]): AnyRef = {
       checkNoArgument(name, arguments)
       new SimpleNumber(value)
     }
@@ -88,7 +88,7 @@ object TemporalAmountModel {
   private[freemarker] class BooleanMember(name: String, value: => Boolean)
     extends TemplateMethodModelEx, TemplateBooleanModel {
 
-    override def exec(arguments: ju.List[_]): AnyRef = {
+    override def exec(arguments: ju.List[?]): AnyRef = {
       checkNoArgument(name, arguments)
       if (value) TemplateBooleanModel.TRUE else TemplateBooleanModel.FALSE
     }
@@ -96,7 +96,7 @@ object TemporalAmountModel {
     override def getAsBoolean: Boolean = value
   }
 
-  private[freemarker] def checkNoArgument(name: String, arguments: ju.List[_]): Unit = {
+  private[freemarker] def checkNoArgument(name: String, arguments: ju.List[?]): Unit = {
     if (!arguments.isEmpty) {
       throw new TemplateModelException(name + " has 0 params,but receive " + arguments.size() + " arguments.")
     }

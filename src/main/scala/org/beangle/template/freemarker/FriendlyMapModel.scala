@@ -30,7 +30,7 @@ import java.util as ju
  *
  * FTL usage: `map.key`, `map?keys`, `map.get(key)`, `?size`, `?values`.
  */
-class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends TemplateHashModelEx
+class FriendlyMapModel(map: ju.Map[?, ?], wrapper: BeansWrapper) extends TemplateHashModelEx
   with TemplateMethodModelEx {
 
   /** FTL `map.key` or `map["key"]` access. */
@@ -54,7 +54,7 @@ class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends Templat
   }
 
   /** FTL `map.get(key)` 方法调用的回退入口（hash 中无 "get" 键时走此路径）。 */
-  override def exec(arguments: java.util.List[_]): AnyRef = {
+  override def exec(arguments: java.util.List[?]): AnyRef = {
     val key = unwrapArg(arguments.get(0))
     wrapValue(map.get(key), key.toString)
   }
@@ -69,7 +69,7 @@ class FriendlyMapModel(map: ju.Map[_, _], wrapper: BeansWrapper) extends Templat
 
   /** 包装 `map.get(key)` 方法调用，供 FTL `map.get(k)` 语法使用。 */
   private class MapGetMethod extends TemplateMethodModelEx {
-    override def exec(arguments: java.util.List[_]): AnyRef = {
+    override def exec(arguments: java.util.List[?]): AnyRef = {
       val key = unwrapArg(arguments.get(0))
       wrapValue(map.get(key), key.toString)
     }

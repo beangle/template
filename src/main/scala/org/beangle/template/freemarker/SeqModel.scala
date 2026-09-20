@@ -20,10 +20,10 @@ package org.beangle.template.freemarker
 import freemarker.template.*
 import org.beangle.commons.bean.Properties
 
-class SeqModel(val seq: collection.Seq[_], objectWrapper: ObjectWrapper) extends TemplateCollectionModel,
+class SeqModel(val seq: collection.Seq[?], objectWrapper: ObjectWrapper) extends TemplateCollectionModel,
   TemplateSequenceModel, TemplateHashModel, AdapterTemplateModel {
 
-  override def getAdaptedObject(hint: Class[_]): Any = seq
+  override def getAdaptedObject(hint: Class[?]): Any = seq
 
   override def get(key: String): TemplateModel = objectWrapper.wrap(Properties.get[Any](seq, key))
 
@@ -37,7 +37,7 @@ class SeqModel(val seq: collection.Seq[_], objectWrapper: ObjectWrapper) extends
     new SeqTemplateModelIterator(seq.iterator, objectWrapper)
   }
 
-  class SeqTemplateModelIterator(val iter: Iterator[_], objectWrapper: ObjectWrapper) extends TemplateModelIterator {
+  class SeqTemplateModelIterator(val iter: Iterator[?], objectWrapper: ObjectWrapper) extends TemplateModelIterator {
     override def next(): TemplateModel = objectWrapper.wrap(iter.next())
 
     def hasNext: Boolean = iter.hasNext

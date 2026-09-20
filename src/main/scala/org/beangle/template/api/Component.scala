@@ -18,11 +18,12 @@
 package org.beangle.template.api
 
 import java.io.Writer
+import scala.compiletime.uninitialized
 
 class Component(val context: ComponentContext) extends ComponentContextAware {
 
   val parameters = new collection.mutable.LinkedHashMap[String, Object]
-  var theme: String = _
+  var theme: String = uninitialized
 
   /**
    * Callback for the start tag of this component. Should the body be  evaluated?

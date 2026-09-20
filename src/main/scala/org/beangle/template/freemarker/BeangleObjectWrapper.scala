@@ -42,7 +42,7 @@ object BeangleObjectWrapper {
 
 class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wrapperConfig(), false) {
 
-  override def unwrap(model: TemplateModel, hint: Class[_]): AnyRef = {
+  override def unwrap(model: TemplateModel, hint: Class[?]): AnyRef = {
     model match {
       case sm: SeqModel => sm.seq
       case _ => super.unwrap(model, hint)
@@ -117,7 +117,7 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
             }
             new SimpleSequence(list, this)
           } else {
-            new SimpleSequence(ju.Arrays.asList(obj.asInstanceOf[Array[_]]: _*), this)
+            new SimpleSequence(ju.Arrays.asList(obj.asInstanceOf[Array[?]]*), this)
           }
         } else {
           BeanInfos.find(obj.getClass) match {

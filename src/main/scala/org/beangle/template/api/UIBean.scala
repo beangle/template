@@ -23,12 +23,13 @@ import org.beangle.template.TemplateLogger
 
 import java.io.Writer
 import java.util as ju
+import scala.compiletime.uninitialized
 
 class UIBean(context: ComponentContext) extends Component(context) {
 
-  var id: String = _
+  var id: String = uninitialized
 
-  var cssClass: String = _
+  var cssClass: String = uninitialized
 
   override def end(writer: Writer, body: String): Boolean = {
     evaluateParams()
@@ -109,7 +110,7 @@ class UIBean(context: ComponentContext) extends Component(context) {
 }
 
 class ClosingUIBean(context: ComponentContext) extends UIBean(context) {
-  var body: String = _
+  var body: String = uninitialized
 
   override def start(writer: Writer): Boolean = {
     evaluateParams()

@@ -38,5 +38,5 @@ trait TemplateEngine {
 
 trait TagTemplateEngine extends TemplateEngine{
 
-  def newTag(context: ComponentContext,clazz: Class[_ <: Component]): Tag
+  def newTag(context: ComponentContext,clazz: Class[? <: Component]): Tag
 }

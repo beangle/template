@@ -27,13 +27,13 @@ import java.io.Writer
 import java.lang.reflect.Constructor
 import java.util as ju
 
-class TagModel(context: ComponentContext, clazz: Class[_ <: Component] = null) extends TemplateTransformModel, Tag {
+class TagModel(context: ComponentContext, clazz: Class[? <: Component] = null) extends TemplateTransformModel, Tag {
 
-  private val componentCon: Constructor[_ <: Component] = if (clazz != null) clazz.getConstructor(classOf[ComponentContext]) else null
+  private val componentCon: Constructor[? <: Component] = if (clazz != null) clazz.getConstructor(classOf[ComponentContext]) else null
 
   private val wrapper = context.engine.asInstanceOf[DefaultTagTemplateEngine].config.getObjectWrapper.asInstanceOf[BeansWrapper]
 
-  def getWriter(writer: Writer, params: ju.Map[_, _]): Writer = {
+  def getWriter(writer: Writer, params: ju.Map[?, ?]): Writer = {
     val bean = getBean
     val iterator = params.keySet().iterator()
     while (iterator.hasNext) {

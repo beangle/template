@@ -28,7 +28,7 @@ class ParametersHashModel(val params: collection.Map[String, Any], wrapper: Obje
     params.get(key) match {
       case Some(v) =>
         if (v.getClass.isArray) {
-          new SimpleScalar(v.asInstanceOf[Array[_]](0).asInstanceOf[String])
+          new SimpleScalar(v.asInstanceOf[Array[?]](0).asInstanceOf[String])
         } else new SimpleScalar(v.asInstanceOf[String])
       case None => null
     }

@@ -84,7 +84,7 @@ class DefaultTagTemplateEngine(modelBuilder: ModelBuilder) extends AbstractTempl
     config.setAutoIncludes(new ju.ArrayList(0))
   }
 
-  override def newTag(context: ComponentContext, clazz: Class[_ <: Component]): Tag = {
+  override def newTag(context: ComponentContext, clazz: Class[? <: Component]): Tag = {
     new TagModel(context, clazz)
   }
 }

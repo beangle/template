@@ -103,7 +103,7 @@ object Themes {
  */
 class Theme(val name: String, val parent: Option[String] = None) {
 
-  def getTemplatePath(clazz: Class[_], suffix: String): String = {
+  def getTemplatePath(clazz: Class[?], suffix: String): String = {
     val sb = new StringBuilder(20)
     sb.append("/themes/").append(name).append('/').append(Strings.uncapitalize(clazz.getSimpleName)).append(suffix)
     sb.toString()
