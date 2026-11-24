@@ -21,10 +21,12 @@ import freemarker.ext.beans.*
 import freemarker.ext.beans.BeansWrapper.{MethodAppearanceDecision, MethodAppearanceDecisionInput}
 import freemarker.template.*
 import org.beangle.commons.lang.Strings.{substringAfter, uncapitalize}
+import org.beangle.commons.lang.math.DecimalConvertible
 import org.beangle.commons.lang.reflect.BeanInfos
 
 import java.beans.PropertyDescriptor
 import java.lang.reflect.{Method, Modifier}
+import java.math.{BigDecimal as JBigDecimal, BigInteger as JBigInteger}
 import java.time.*
 import java.time.chrono.{ChronoLocalDate, ChronoLocalDateTime, ChronoZonedDateTime}
 import java.time.temporal.Temporal
@@ -32,6 +34,16 @@ import java.util as ju
 import scala.jdk.javaapi.CollectionConverters.asJava
 
 object BeangleObjectWrapper {
+
+  /** FreeMarker only understands JDK standard number classes when comparing or computing signum. */
+  private def toTemplateNumber(num: Number): Number = num match {
+    // Custom decimal types can provide an exact conversion without a toString round-trip.
+    case d: DecimalConvertible => d.toBigDecimal
+    case _: java.lang.Byte | _: java.lang.Short | _: java.lang.Integer | _: java.lang.Long |
+         _: java.lang.Float | _: java.lang.Double | _: JBigDecimal | _: JBigInteger => num
+    case _ => new JBigDecimal(num.toString)
+  }
+
   def wrapperConfig(): BeansWrapperConfiguration = {
     val config = new DefaultObjectWrapperConfiguration(Configuration.VERSION_2_3_35) {}
     config.setMethodAppearanceFineTuner(new ScalaMethodAppearanceFineTuner)
@@ -54,7 +66,7 @@ class BeangleObjectWrapper extends DefaultObjectWrapper(BeangleObjectWrapper.wra
     obj match {
       //basic types
       case s: String => new SimpleScalar(s)
-      case num: Number => new SimpleNumber(num)
+      case num: Number => new SimpleNumber(BeangleObjectWrapper.toTemplateNumber(num))
       case temporal: Temporal =>
         temporal match {
           case t: Instant => new SimpleDate(java.util.Date.from(t), TemplateDateModel.DATETIME)
